@@ -14,7 +14,7 @@ bool whiteLightOn = false;
 
 void setup() {
     Serial.begin(115200);
-    pinMode(WHITE_LED_PIN, OUTPUT);
+    pinMode(WHITE_LED_1_PIN, OUTPUT);
     pinMode(RED_LED_PIN, OUTPUT);
     pinMode(LIGHT_SENSOR_PIN, INPUT);
 
@@ -26,12 +26,12 @@ void loop() {
         if (hasPhotoSensor) {
             if ((getLightSensorValue() == true) && (whiteLightOn == false)) {
                 // Serial.println("It's dark");
-                digitalWrite(WHITE_LED_PIN, HIGH);
+                digitalWrite(WHITE_LED_1_PIN, HIGH);
                 whiteLightOn = true;
             }
             if ((getLightSensorValue() == false) && (whiteLightOn == true)) {
                 // Serial.println("It's light");
-                digitalWrite(WHITE_LED_PIN, LOW);
+                digitalWrite(WHITE_LED_1_PIN, LOW);
                 whiteLightOn = false;
             }
         }
