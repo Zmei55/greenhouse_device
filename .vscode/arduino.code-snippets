@@ -1,0 +1,7 @@
+{
+    "Named export": {
+		"scope": "c,cpp",
+		"prefix": "lam",
+		"body": ["[](){$1}"],
+	},
+}
