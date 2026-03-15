@@ -9,6 +9,8 @@ bool isDark = false;
 
 /** Возвращает булевое значение освещенности
  * настраивается на датчике, переменным резистором
+ * true -> темно
+ * false -> светло
  */
 bool getLightSensorValue() {
     isDark = digitalRead(LIGHT_SENSOR_PIN);

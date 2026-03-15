@@ -8,13 +8,14 @@
 
 MyUtils utils;
 
-const uint32_t ONE_SECOND = 1000;
 bool redLightOn = false;
-bool whiteLightOn = false;
+bool ledStripsOn = false;
 
 void setup() {
     Serial.begin(115200);
-    pinMode(WHITE_LED_1_PIN, OUTPUT);
+    pinMode(LED_STRIP_ONE_PIN, OUTPUT);
+    pinMode(LED_STRIP_TWO_PIN, OUTPUT);
+    pinMode(LED_STRIP_THREE_PIN, OUTPUT);
     pinMode(RED_LED_PIN, OUTPUT);
     pinMode(LIGHT_SENSOR_PIN, INPUT);
 
@@ -22,30 +23,39 @@ void setup() {
 }
 
 void loop() {
-    utils.interval(ONE_SECOND, [](){
+    utils.interval(controlTime, [](){
         if (hasPhotoSensor) {
-            if ((getLightSensorValue() == true) && (whiteLightOn == false)) {
-                // Serial.println("It's dark");
-                digitalWrite(WHITE_LED_1_PIN, HIGH);
-                whiteLightOn = true;
+            /** Включение освещения при темноте */
+            if ((getLightSensorValue() == true) && (ledStripsOn == false)) {
+                if (ledStripOneEnabled) digitalWrite(LED_STRIP_ONE_PIN, HIGH);
+                if (ledStripTwoEnabled) digitalWrite(LED_STRIP_TWO_PIN, HIGH);
+                if (ledStripThreeEnabled) digitalWrite(LED_STRIP_THREE_PIN, HIGH);
+                ledStripsOn = true;
             }
-            if ((getLightSensorValue() == false) && (whiteLightOn == true)) {
-                // Serial.println("It's light");
-                digitalWrite(WHITE_LED_1_PIN, LOW);
-                whiteLightOn = false;
+            /** Выключение освещения при свете */
+            if ((getLightSensorValue() == false) && (ledStripsOn == true)) {
+                digitalWrite(LED_STRIP_ONE_PIN, LOW);
+                digitalWrite(LED_STRIP_TWO_PIN, LOW);
+                digitalWrite(LED_STRIP_THREE_PIN, LOW);
+                ledStripsOn = false;
             }
         }
 
         if (hasDHT22Sensor) {
-            // Serial.println(getTemperature());
+            /** Включение ... если температура выше установленного значения */
             if ((getTemperature() > controlTemperature) && (redLightOn == false)) {
                 digitalWrite(RED_LED_PIN, HIGH);
                 redLightOn = true;
             }
+            /** Выключение ... если температура ниже установленного значения */
             if ((getTemperature() < controlTemperature) && (redLightOn == true)) {
                 digitalWrite(RED_LED_PIN, LOW);
                 redLightOn = false;
             }
+        }
+
+        if (hasSoilMoistureSensor) {
+            Serial.println(analogRead(SOIL_MOISTURE_PIN));
         }
     });
 }
