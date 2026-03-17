@@ -1,18 +1,13 @@
-#pragma once
+#ifndef LIGHT_SENSOR_H
+#define LIGHT_SENSOR_H
 
-#include <Arduino.h>
 #include "config.h"
-
-#define LIGHT_SENSOR_PIN 21
-
-bool isDark = false;
 
 /** Возвращает булевое значение освещенности
  * настраивается на датчике, переменным резистором
  * true -> темно
  * false -> светло
  */
-bool getLightSensorValue() {
-    isDark = digitalRead(LIGHT_SENSOR_PIN);
-    return isDark;
-}
+bool getLightSensorValue();
+
+#endif
