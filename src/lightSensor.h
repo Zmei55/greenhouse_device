@@ -1,5 +1,4 @@
-#ifndef LIGHT_SENSOR_H
-#define LIGHT_SENSOR_H
+#pragma once
 
 #include "config.h"
 
@@ -9,5 +8,3 @@
  * false -> светло
  */
 bool getLightSensorValue();
-
-#endif

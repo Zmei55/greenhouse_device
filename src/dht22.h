@@ -3,8 +3,7 @@
  * getTemperature() - возвращает значение температуры воздуха (float)
  * getHumidity() - возвращает значение влажность воздуха (float)
  */
-#ifndef DHT22_H
-#define DHT22_H
+#pragma once
 
 #include <DHT.h>
 
@@ -17,5 +16,3 @@ float getTemperature();
 
 /** Возвращает значение влажности воздуха */
 float getHumidity();
-
-#endif

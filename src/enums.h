@@ -1,5 +1,4 @@
-#ifndef ENUMS_H
-#define ENUMS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -17,5 +16,3 @@ enum SoilMoistureLevel: uint16_t {
     DRY = 3710,
     WET = 1490,
 };
-
-#endif

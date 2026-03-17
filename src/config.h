@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include <stdint.h>
 
@@ -31,5 +30,3 @@ extern float controlTemperature;
 extern bool ledStripOneEnabled;
 extern bool ledStripTwoEnabled;
 extern bool ledStripThreeEnabled;
-
-#endif
