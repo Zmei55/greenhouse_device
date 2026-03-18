@@ -1,9 +1,6 @@
 #pragma once
 
-#include <Arduino.h>
-
-#include "config.h"
-#include "lightSensor.h"
+#include <stdint.h>
 
 class MyUtils {
    public:
@@ -17,4 +14,10 @@ class MyUtils {
 
     /** Управляет освещением растений */
     void lightingPlant();
+
+    /** Управление открыванием окна в зависимости от температуры */
+    void controlMotorByTemperature();
+
+    /** Управление поливом в зависимости от влажности почвы */
+    void controlWaterByMoisture();
 };
