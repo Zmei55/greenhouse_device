@@ -5,10 +5,10 @@
 /** Настройка пинов для ESP32_C3 */
 #if defined(ESP32)
 uint8_t RED_LED_PIN = 0;
+uint8_t SOIL_MOISTURE_PIN = 1;
 uint8_t LED_STRIP_ONE_PIN = 5;
 uint8_t LED_STRIP_TWO_PIN = 6;
 uint8_t LED_STRIP_THREE_PIN = 7;
-uint8_t SOIL_MOISTURE_PIN = 1;
 uint8_t WATER_PIN = 10;
 uint8_t DHT22_PIN = 20;
 uint8_t LIGHT_SENSOR_PIN = 21;
