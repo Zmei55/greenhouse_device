@@ -8,31 +8,14 @@
 
 MyUtils::MyUtils() {}
 
-void MyUtils::interval(uint32_t delay, void (*callback)()) {
-    static uint32_t lastTime = millis();
-
-    if (millis() - lastTime >= delay) {
-        lastTime = millis();
-        callback();
-    }
-}
-
-void MyUtils::timer(uint32_t delay, void (*callback)()) {
-    static uint32_t lastTime = millis();
-
-    if (millis() - lastTime >= delay) {
-        callback();
-    }
-}
-
 void MyUtils::lightingPlant() {
     static bool ledStripsOn = false;
 
     /** Включение освещения при темноте */
     if ((getLightSensorValue() == true) && (ledStripsOn == false)) {
-        if (ledStripOneEnabled) digitalWrite(LED_STRIP_ONE_PIN, HIGH);
-        if (ledStripTwoEnabled) digitalWrite(LED_STRIP_TWO_PIN, HIGH);
-        if (ledStripThreeEnabled) digitalWrite(LED_STRIP_THREE_PIN, HIGH);
+        digitalWrite(LED_STRIP_ONE_PIN, HIGH);
+        digitalWrite(LED_STRIP_TWO_PIN, HIGH);
+        digitalWrite(LED_STRIP_THREE_PIN, HIGH);
         ledStripsOn = true;
     }
     /** Выключение освещения при свете */
@@ -59,50 +42,10 @@ void MyUtils::controlMotorByTemperature() {
     }
 }
 
-void MyUtils::controlWaterByMoisture() {
-    static bool waterOn = false;
-
-    // Serial.print("1: ");
-    // Serial.println(analogRead(SOIL_MOISTURE_PIN));
-    // /** Включение полива при сухой почве */
-    // if ((analogRead(SOIL_MOISTURE_PIN) > SoilMoistureLevel::DRY) && (waterOn == false)) {
-    //     digitalWrite(WATER_PIN, HIGH);
-    //     waterOn = true;
-    // }
-
-    // if (waterOn == true) {
-    //     utils.interval(TimeApp::ONE_SECOND, [](){
-    //         Serial.print("2: ");
-    //         Serial.println(analogRead(SOIL_MOISTURE_PIN));
-
-    //         /** Выключение полива при влажной почве */
-    //         if (analogRead(SOIL_MOISTURE_PIN) < 2000) {
-    //             digitalWrite(WATER_PIN, LOW);
-    //             waterOn = false;
-    //         }
-    //     });
-    // }
-
-    // utils.interval(TimeApp::ONE_SECOND, [](){
-    //     Serial.print("2: ");
-    //     Serial.println(analogRead(SOIL_MOISTURE_PIN));
-    //     /** Выключение полива при влажной почве */
-    //     if ((analogRead(SOIL_MOISTURE_PIN) < SoilMoistureLevel::WET * 2) && (waterOn == true)) {
-    //         digitalWrite(WATER_PIN, LOW);
-    //         waterOn = false;
-    //     }
-    // });
-
-    // if (waterOn == true) {
-    //     utils.interval(TimeApp::ONE_SECOND, [](){
-    //         Serial.print("2: ");
-    //         Serial.println(analogRead(SOIL_MOISTURE_PIN));
-
-    //         /** Выключение полива при влажной почве */
-    //         if (analogRead(SOIL_MOISTURE_PIN) < SoilMoistureLevel::WET * 2) {
-    //             digitalWrite(WATER_PIN, LOW);
-    //             waterOn = false;
-    //         }
-    //     });
-    // }
+void MyUtils::enablingWaterByMoisture(bool *flag) {
+    /** Включение полива при сухой почве */
+    if ((analogRead(SOIL_MOISTURE_PIN) > 3750) && (*flag == false)) {
+        digitalWrite(WATER_PIN, HIGH);
+        *flag = true;
+    }
 }
