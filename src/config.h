@@ -1,17 +1,31 @@
 #pragma once
 
+#include <stdint.h>
+
+#include "enums.h"
+
 /** Pins */
-#define RED_LED_PIN 0
-#define WHITE_LED_1_PIN 5
-#define WHITE_LED_2_PIN 6
-#define WHITE_LED_3_PIN 7
-#define SOIL_MOISTURE_PIN 1
+extern uint8_t RED_LED_PIN;
+extern uint8_t LED_STRIP_ONE_PIN;
+extern uint8_t LED_STRIP_TWO_PIN;
+extern uint8_t LED_STRIP_THREE_PIN;
+extern uint8_t SOIL_MOISTURE_PIN;
+extern uint8_t WATER_PIN;
+extern uint8_t DHT22_PIN;
+extern uint8_t LIGHT_SENSOR_PIN;
+
+/** General settings */
+extern uint32_t controlTime;
 
 /** Sensors */
-bool hasDHT22Sensor = true;
-// bool hasSoilMoistureSensor = false;
-bool hasPhotoSensor = true;
-// bool hasTimeSensor = true;
+extern bool hasDHT22Sensor;
+extern bool hasSoilMoistureSensor;
+extern bool hasPhotoSensor;
+// extern bool hasTimeSensor;
 
 /** DHT config */
-float controlTemperature = 24.0;
+extern float controlTemperature;
+
+/** Soil moisture config */
+extern uint16_t soilMoistureDryValue; // Значение, при котором включается полив
+extern uint16_t soilMoistureWetValue; // Значение, при котором выключается полив
