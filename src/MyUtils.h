@@ -11,10 +11,11 @@ public:
     void lightingPlant();
 
     /** Управление открыванием окна в зависимости от температуры */
-    void controlMotorByTemperature();
+    void controlMotorByTemperature(bool *flag);
 
-    /** Управление поливом в зависимости от влажности почвы */
+    /** Включение полива при сухой почве */
     void enablingWaterByMoisture(bool *flag);
 
-    // void wateringPlant();
+    /** Выключение полива при сухой почве */
+    void disablingWaterByMoisture(bool *flag);
 };

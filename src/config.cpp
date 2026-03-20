@@ -15,18 +15,19 @@ uint8_t LIGHT_SENSOR_PIN = 21;
 #endif
 
 /** General settings */
-uint32_t controlTime = TimeApp::ONE_SECOND;
+uint32_t controlTime = TimeApp::ONE_SECOND * 10;
 
 /** Sensors */
 bool hasDHT22Sensor = true;
+// bool hasDHT22Sensor = false;
 bool hasSoilMoistureSensor = true;
 bool hasPhotoSensor = true;
+// bool hasPhotoSensor = false;
 // bool hasTimeSensor = true;
 
 /** DHT config */
 float controlTemperature = 24.0;
 
-/** Led strips config */
-bool ledStripOneEnabled = true;
-bool ledStripTwoEnabled = true;
-bool ledStripThreeEnabled = true;
+/** Soil moisture config */
+uint16_t soilMoistureDryValue = 3750;
+uint16_t soilMoistureWetValue = 3600;

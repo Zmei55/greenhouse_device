@@ -26,7 +26,6 @@ extern bool hasPhotoSensor;
 /** DHT config */
 extern float controlTemperature;
 
-/** Led strips config */
-extern bool ledStripOneEnabled;
-extern bool ledStripTwoEnabled;
-extern bool ledStripThreeEnabled;
+/** Soil moisture config */
+extern uint16_t soilMoistureDryValue; // Значение, при котором включается полив
+extern uint16_t soilMoistureWetValue; // Значение, при котором выключается полив

@@ -27,25 +27,31 @@ void MyUtils::lightingPlant() {
     }
 }
 
-void MyUtils::controlMotorByTemperature() {
-    static bool redLightOn = false;
+void MyUtils::controlMotorByTemperature(bool *flag) {
+    static bool isWindowOpen = false;
+    Serial.print("Temperature: ");
+    Serial.println(getTemperature());
 
-    /** Включение ... если температура выше установленного значения */
-    if ((getTemperature() > controlTemperature) && (redLightOn == false)) {
-        digitalWrite(RED_LED_PIN, HIGH);
-        redLightOn = true;
+    /** Открывает окно если температура выше установленного значения */
+    if ((getTemperature() > controlTemperature) && (isWindowOpen == false)) {
+        // openingWindow();
+        *flag = true;
+        isWindowOpen = true;
     }
-    /** Выключение ... если температура ниже установленного значения */
-    if ((getTemperature() < controlTemperature) && (redLightOn == true)) {
-        digitalWrite(RED_LED_PIN, LOW);
-        redLightOn = false;
+    /** Закрывает окно если температура ниже установленного значения */
+    if ((getTemperature() < controlTemperature) && (isWindowOpen == true)) {
+        // closingWindow();
+        *flag = true;
+        isWindowOpen = false;
     }
 }
 
 void MyUtils::enablingWaterByMoisture(bool *flag) {
-    /** Включение полива при сухой почве */
-    if ((analogRead(SOIL_MOISTURE_PIN) > 3750) && (*flag == false)) {
-        digitalWrite(WATER_PIN, HIGH);
-        *flag = true;
-    }
+    digitalWrite(WATER_PIN, HIGH);
+    *flag = true;
+}
+
+void MyUtils::disablingWaterByMoisture(bool *flag) {
+    digitalWrite(WATER_PIN, LOW);
+    *flag = false;
 }
