@@ -27,25 +27,6 @@ void MyUtils::lightingPlant() {
     }
 }
 
-void MyUtils::controlMotorByTemperature(bool *flag) {
-    static bool isWindowOpen = false;
-    Serial.print("Temperature: ");
-    Serial.println(getTemperature());
-
-    /** Открывает окно если температура выше установленного значения */
-    if ((getTemperature() > controlTemperature) && (isWindowOpen == false)) {
-        // openingWindow();
-        *flag = true;
-        isWindowOpen = true;
-    }
-    /** Закрывает окно если температура ниже установленного значения */
-    if ((getTemperature() < controlTemperature) && (isWindowOpen == true)) {
-        // closingWindow();
-        *flag = true;
-        isWindowOpen = false;
-    }
-}
-
 void MyUtils::enablingWaterByMoisture(bool *flag) {
     digitalWrite(WATER_PIN, HIGH);
     *flag = true;
@@ -55,3 +36,35 @@ void MyUtils::disablingWaterByMoisture(bool *flag) {
     digitalWrite(WATER_PIN, LOW);
     *flag = false;
 }
+
+/** Запуск мотора для открытия окна */
+// void openingWindow() {
+//     digitalWrite(RED_LED_PIN, HIGH);
+// }
+
+/** Запуск мотора для закрытия окна */
+// void closingWindow() {
+//     digitalWrite(RED_LED_PIN, HIGH);
+// }
+
+// void MyUtils::controlMotorByTemperature(bool *flag) {
+//     static bool isWindowOpen = false;
+
+//     /** Открывает окно если температура выше установленного значения */
+//     if ((getTemperature() > controlTemperature) && (isWindowOpen == false)) {
+//         openingWindow();
+//         *flag = true;
+//         isWindowOpen = true;
+//     }
+//     /** Закрывает окно если температура ниже установленного значения */
+//     if ((getTemperature() < controlTemperature) && (isWindowOpen == true)) {
+//         closingWindow();
+//         *flag = true;
+//         isWindowOpen = false;
+//     }
+// }
+
+// void MyUtils::disabledWindowMotor(bool *flag) {
+//     digitalWrite(RED_LED_PIN, LOW);
+//     *flag = false;
+// }
