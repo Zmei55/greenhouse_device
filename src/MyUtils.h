@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "ds3231.h"
+
 class MyUtils
 {
 public:
@@ -16,9 +18,9 @@ public:
     /** Выключение полива при сухой почве */
     void disablingWaterByMoisture(bool *flag);
 
-    /** Управление открыванием окна в зависимости от температуры */
-    // void controlMotorByTemperature(bool *flag);
+    /** Переводит время из DateTime в целое число */
+    uint32_t getNowTimeToInt(DateTime time);
 
-    /** Останавливает процесс открытия/закрытия окна */
-    // void disabledWindowMotor(bool *flag);
+    /** Управление открыванием окна в зависимости от температуры */
+    void controlMotorByTemperature(bool *flag);
 };

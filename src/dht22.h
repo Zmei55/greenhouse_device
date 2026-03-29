@@ -7,12 +7,10 @@
 
 #include <DHT.h>
 
-#include "config.h"
-
-extern DHT dht;
+// extern DHT dht;
 
 /** Возвращает значение температуры воздуха */
-float getTemperature();
+// float getTemperature();
 
 /** Возвращает значение влажности воздуха */
-float getHumidity();
+// float getHumidity();

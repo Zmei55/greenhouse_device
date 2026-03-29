@@ -4,7 +4,6 @@
 
 #include "config.h"
 #include "lightSensor.h"
-#include "dht22.h"
 
 MyUtils::MyUtils() {}
 
@@ -37,34 +36,25 @@ void MyUtils::disablingWaterByMoisture(bool *flag) {
     *flag = false;
 }
 
-/** Запуск мотора для открытия окна */
-// void openingWindow() {
-//     digitalWrite(RED_LED_PIN, HIGH);
-// }
-
-/** Запуск мотора для закрытия окна */
-// void closingWindow() {
-//     digitalWrite(RED_LED_PIN, HIGH);
-// }
+uint32_t MyUtils::getNowTimeToInt(DateTime time) {
+    return time.hour() * 3600 + time.minute() * 60 + time.second();
+}
 
 // void MyUtils::controlMotorByTemperature(bool *flag) {
 //     static bool isWindowOpen = false;
+//     Serial.print("Temperature: ");
+//     Serial.println(getTemperature());
 
 //     /** Открывает окно если температура выше установленного значения */
 //     if ((getTemperature() > controlTemperature) && (isWindowOpen == false)) {
-//         openingWindow();
+//         // openingWindow();
 //         *flag = true;
 //         isWindowOpen = true;
 //     }
 //     /** Закрывает окно если температура ниже установленного значения */
 //     if ((getTemperature() < controlTemperature) && (isWindowOpen == true)) {
-//         closingWindow();
+//         // closingWindow();
 //         *flag = true;
 //         isWindowOpen = false;
 //     }
-// }
-
-// void MyUtils::disabledWindowMotor(bool *flag) {
-//     digitalWrite(RED_LED_PIN, LOW);
-//     *flag = false;
 // }
