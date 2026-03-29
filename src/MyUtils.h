@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "ds3231.h"
+
 class MyUtils
 {
 public:
@@ -10,12 +12,15 @@ public:
     /** Управляет освещением растений */
     void lightingPlant();
 
-    /** Управление открыванием окна в зависимости от температуры */
-    void controlMotorByTemperature(bool *flag);
-
     /** Включение полива при сухой почве */
     void enablingWaterByMoisture(bool *flag);
 
     /** Выключение полива при сухой почве */
     void disablingWaterByMoisture(bool *flag);
+
+    /** Переводит время из DateTime в целое число */
+    uint32_t getNowTimeToInt(DateTime time);
+
+    /** Управление открыванием окна в зависимости от температуры */
+    void controlMotorByTemperature(bool *flag);
 };

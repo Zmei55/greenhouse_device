@@ -4,14 +4,12 @@
 
 #define DHTTYPE DHT22
 
-DHT dht(DHT22_PIN, DHTTYPE);
+// DHT dht(DHT22_PIN, DHTTYPE);
 
-/** Возвращает значение температуры воздуха */
-float getTemperature() {
-    return dht.readTemperature();
-}
+// float getTemperature() {
+//     return dht.readTemperature();
+// }
 
-/** Возвращает значение влажности воздуха */
-float getHumidity() {
-    return dht.readHumidity();
-}
+// float getHumidity() {
+//     return dht.readHumidity();
+// }
