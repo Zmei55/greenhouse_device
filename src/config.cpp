@@ -11,18 +11,22 @@ uint8_t LED_STRIP_ONE_PIN = 5;
 uint8_t LED_STRIP_TWO_PIN = 6;
 uint8_t LED_STRIP_THREE_PIN = 7;
 uint8_t WATER_PIN = 10;
-// uint8_t THERMOMETER_PIN = 20;
+uint8_t THERMOMETER_PIN = 20;
 uint8_t LIGHT_SENSOR_PIN = 21;
 #endif
 
 /** General settings */
-uint32_t controlTime = TimeApp::ONE_SECOND;
+uint32_t controlTime = TimeApp::ONE_SECOND * 5;
 
 /** Sensors */
-bool hasSoilMoistureSensor = true;
-bool hasPhotoSensor = true;
-// bool hasPhotoSensor = false;
-bool hasTimeSensor = true;
+// bool hasSoilMoistureSensor = true;
+bool hasSoilMoistureSensor = false;
+// bool hasPhotoSensor = true;
+bool hasPhotoSensor = false;
+// bool hasTimeSensor = true;
+bool hasTimeSensor = false;
+bool hasTemperatureSensor = true;
+// bool hasTemperatureSensor = false;
 
 /** Temperature config */
 float controlTemperature = 24.0;

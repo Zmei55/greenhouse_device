@@ -12,7 +12,7 @@ extern uint8_t LED_STRIP_ONE_PIN;
 extern uint8_t LED_STRIP_TWO_PIN;
 extern uint8_t LED_STRIP_THREE_PIN;
 extern uint8_t WATER_PIN;
-// extern uint8_t THERMOMETER_PIN;
+extern uint8_t THERMOMETER_PIN;
 extern uint8_t LIGHT_SENSOR_PIN;
 
 /** General settings */
@@ -22,6 +22,7 @@ extern uint32_t controlTime;
 extern bool hasSoilMoistureSensor;
 extern bool hasPhotoSensor;
 extern bool hasTimeSensor;
+extern bool hasTemperatureSensor;
 
 /** Temperature config */
 extern float controlTemperature;
