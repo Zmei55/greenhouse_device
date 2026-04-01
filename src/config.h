@@ -7,11 +7,12 @@
 /** Pins */
 // extern uint8_t MOTOR_IN_1_PIN;
 // extern uint8_t MOTOR_IN_2_PIN;
-extern uint8_t SOIL_MOISTURE_PIN;
+// extern uint8_t WATER_IN_3_PIN;
+// extern uint8_t WATER_IN_4_PIN;
 extern uint8_t LED_STRIP_ONE_PIN;
 extern uint8_t LED_STRIP_TWO_PIN;
 extern uint8_t LED_STRIP_THREE_PIN;
-extern uint8_t WATER_PIN;
+extern uint8_t SOIL_MOISTURE_PIN;
 extern uint8_t THERMOMETER_PIN;
 extern uint8_t LIGHT_SENSOR_PIN;
 

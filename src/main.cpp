@@ -5,57 +5,99 @@
 
 #include "config.h"
 #include "myUtils.h"
+#include "lightSensor.h"
 #include "ds3231.h"
 
 MyTimer timer;
 MyUtils utils;
 GyverDS18Single term(THERMOMETER_PIN);
 
-bool isWaterOn;
+bool isLedStripsOn; // Включено ли освещение (по ум: false)
+bool isWaterOn; // Включен ли полив (по ум: false)
 
 /** Одноразовая проверка всех датчиков при включении МК */
 void checkSensorsOnce() {
-    timer.timer(TimeApp::ONE_SECOND, [](){
-        /** Если датчик освещенности подключен, то выполняется код */
+    /** Проверка времени, если время рабочее, то выполняется код */
+    bool isWorkingHours = (utils.getNowTimeToInt(rtc.now()) >= startTimeToInt) && (utils.getNowTimeToInt(rtc.now()) <= endTimeToInt);
+    
+    if (isWorkingHours) {
+        /** Если датчик освещенности подключен, то выполняется код... */
         if (hasPhotoSensor) {
-            utils.lightingPlant();
+            bool isDark = (getLightSensorValue() == true);
+            
+            /** Если естественного освещения не достаточно, то выполняется код... */
+            if (isDark) {
+                utils.enablingLighting(&isLedStripsOn);
+            }
         }
+
         /** Если датчик влажности почвы подключен, то выполняется код */
         if (hasSoilMoistureSensor) {
-            if ((analogRead(SOIL_MOISTURE_PIN) > soilMoistureDryValue) && (isWaterOn == false)) {
-                utils.enablingWaterByMoisture(&isWaterOn);
+            /** Почва сухая */
+            bool isSoilDry = (analogRead(SOIL_MOISTURE_PIN) > soilMoistureDryValue);
+
+            if (isSoilDry) {
+                utils.enablingWatering(&isWaterOn);
             }
         }
-       /** Если датчик температуры подключен, и данные с датчика получены, то выполняется код */
+
+        /** Если датчик температуры подключен, и данные с датчика получены, то выполняется код */
         if (hasTemperatureSensor && term.waitReady() && term.readTemp()) {
-            if (term.getTemp() > controlTemperature) {
+            /** Текущая температура выше контрольной */
+            bool isTemperatureHigh = term.getTemp() > controlTemperature;
+
+            if (isTemperatureHigh) {
                 Serial.print("Жарко!!!");
+                Serial.println(term.getTemp());
             }
         }
-    });
+    }
 }
 
-/** Одноразовая проверка всех датчиков по контрольному времени */
+/** Работа всех датчиков по контрольному времени (повторяющийся интервал) */
 void checkSensorsByControlTime() {
     timer.interval(controlTime, [](){
+        Serial.println(term.getTemp());
         /** Проверка времени, если время рабочее, то выполняется код */
-        if ((utils.getNowTimeToInt(rtc.now()) >= startTimeToInt) && (utils.getNowTimeToInt(rtc.now()) <= endTimeToInt)) {
-            /** Если датчик освещенности подключен, то выполняется код */
+        bool isWorkingHours = (utils.getNowTimeToInt(rtc.now()) >= startTimeToInt) && (utils.getNowTimeToInt(rtc.now()) <= endTimeToInt);
+        if (isWorkingHours) {
+            Serial.println("Работаем");
+            /** Если датчик освещенности подключен, то выполняется код... */
             if (hasPhotoSensor) {
-                utils.lightingPlant();
+                bool isDarkAndLedStripsOff = (getLightSensorValue() == true) && (isLedStripsOn == false);
+                bool isLightAndLedStripsOn = (getLightSensorValue() == false) && (isLedStripsOn == true);
+                
+                /** Если естественного освещения не достаточно, то выполняется код... */
+                if (isDarkAndLedStripsOff) {
+                    utils.enablingLighting(&isLedStripsOn);
+                }
+
+                /** Если естественного освещения достаточно, то выполняется код... */
+                if (isLightAndLedStripsOn) {
+                    utils.disablingLighting(&isLedStripsOn);
+                }
             }
 
             /** Если датчик влажности почвы подключен, то выполняется код */
             if (hasSoilMoistureSensor) {
-                if ((analogRead(SOIL_MOISTURE_PIN) > soilMoistureDryValue) && (isWaterOn == false)) {
-                    utils.enablingWaterByMoisture(&isWaterOn);
+                /** Почва сухая и полив выключен */
+                bool isSoilDryAndWateringOff = (analogRead(SOIL_MOISTURE_PIN) > soilMoistureDryValue) && (isWaterOn == false);
+
+                if (isSoilDryAndWateringOff) {
+                    utils.enablingWatering(&isWaterOn);
                 }
             }
 
             /** Если датчик температуры подключен, запрос данных с датчика, ожидание данных, данные с датчика получены, то выполняется код */
             if (hasTemperatureSensor && term.requestTemp() && term.waitReady() && term.readTemp()) {
-                if (term.getTemp() > controlTemperature) {
-                    Serial.print("Жарко!!!");
+                /** Текущая температура выше контрольной */
+                bool isTemperatureHigh = term.getTemp() > controlTemperature;
+                
+                if (isTemperatureHigh) {
+                    Serial.println("Жарко!!!");
+                    // analogWrite(MOTOR_IN_1_PIN, 75);
+                    // digitalWrite(MOTOR_IN_1_PIN, HIGH);
+                    // digitalWrite(MOTOR_IN_2_PIN, LOW);
                 }
             }
         } else {
@@ -76,15 +118,19 @@ void setup() {
     pinMode(LED_STRIP_TWO_PIN, OUTPUT);
     pinMode(LED_STRIP_THREE_PIN, OUTPUT);
     pinMode(SOIL_MOISTURE_PIN, INPUT);
-    pinMode(WATER_PIN, OUTPUT);
+    // pinMode(MOTOR_IN_1_PIN, OUTPUT);
+    // pinMode(MOTOR_IN_2_PIN, OUTPUT);
     
     term.setResolution(12); // Установка разрешения датчика температуры (9-12 бит, чем выше, тем точнее, но дольше измерение)
     term.requestTemp(); // Запрос на измерение температуры (необходимо для получения данных при первом вызове term.tick())
+    isLedStripsOn = false;
     isWaterOn = false;
+
+    checkSensorsOnce();
 }
 
 void loop() {
-    checkSensorsOnce();
+    // checkSensorsOnce();
 
     checkSensorsByControlTime();
 
@@ -93,8 +139,11 @@ void loop() {
      * Если влажность достаточная, то полив отключается, даже если сейчас не рабочее время
      */
     timer.intervalWithFlag(TimeApp::ONE_SECOND, &isWaterOn, [](){
-        if ((analogRead(SOIL_MOISTURE_PIN) < soilMoistureWetValue) && (isWaterOn == true)) {
-            utils.disablingWaterByMoisture(&isWaterOn);
+        /** Почва влажная и полив включен */
+        bool isSoilWetAndWateringOn = (analogRead(SOIL_MOISTURE_PIN) < soilMoistureWetValue) && (isWaterOn == true);
+        
+        if (isSoilWetAndWateringOn) {
+            utils.disablingWatering(&isWaterOn);
         }
     });
 
