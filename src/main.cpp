@@ -7,6 +7,7 @@
 #include "myUtils.h"
 #include "lightSensor.h"
 #include "ds3231.h"
+#include "api.h"
 
 MyTimer timer;
 MyUtils utils;
@@ -130,6 +131,11 @@ void checkSensorsByControlTime() {
 void setup() {
     Serial.begin(115200);
     Wire.begin();
+    WiFi.mode(WIFI_AP);
+    char SSID[21];
+    char PASSWORD[21];
+    WiFi.softAP(SSID, PASSWORD);
+
     rtc.begin();
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); // Установка времени компиляции кода (можно закомментировать после первой загрузки)
     
@@ -147,6 +153,10 @@ void setup() {
     isWaterOn = false;
     isMotorOn = false;
     isWindowOpen = false;
+
+    apiHandler();
+
+    server.begin();
 }
 
 void loop() {

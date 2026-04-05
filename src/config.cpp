@@ -1,23 +1,35 @@
 #include "config.h"
 
+#if defined(ESP32) || defined(ESP8266)
+    AsyncWebServer server(80);
+#endif
+
 /** Pins */
 
 /** Настройка пинов для ESP32_C3 */
 #if defined(ESP32)
-// uint8_t MOTOR_IN_1_PIN = 0;
-// uint8_t MOTOR_IN_2_PIN = 20;
-// uint8_t WATER_IN_3_PIN = 1;
-// uint8_t WATER_IN_4_PIN = 10;
-uint8_t LED_STRIP_ONE_PIN = 5;
-uint8_t LED_STRIP_TWO_PIN = 6;
-uint8_t LED_STRIP_THREE_PIN = 7;
-uint8_t SOIL_MOISTURE_PIN = 4;
-uint8_t THERMOMETER_PIN = 3;
-uint8_t LIGHT_SENSOR_PIN = 21;
+    // uint8_t MOTOR_IN_1_PIN = 0;
+    // uint8_t MOTOR_IN_2_PIN = 20;
+    // uint8_t WATER_IN_3_PIN = 1;
+    // uint8_t WATER_IN_4_PIN = 10;
+    uint8_t LED_STRIP_ONE_PIN = 5;
+    uint8_t LED_STRIP_TWO_PIN = 6;
+    uint8_t LED_STRIP_THREE_PIN = 7;
+    uint8_t SOIL_MOISTURE_PIN = 4;
+    uint8_t THERMOMETER_PIN = 3;
+    uint8_t LIGHT_SENSOR_PIN = 21;
 #endif
+
+// #if defined(ESP8266)
+// здесь можно указать пины для ESP8266, если планируется поддержка этой платформы
+// #endif
 
 /** General settings */
 uint32_t controlTime = TimeApp::ONE_SECOND * 10;
+
+/** WiFi config */
+char SSID[21] = "greenhouse";
+char PASSWORD[21] = "";
 
 /** Sensors
  * true - датчик подключен и используется в работе
@@ -50,6 +62,5 @@ struct EndTime {
     uint8_t hour = 20; // Час выключения аппарата (20)
     uint8_t minute = 0; // Минуты включения аппарата (00)
 } end;
-
 uint32_t startTimeToInt = start.hour * 3600 + start.minute * 60; // Время включения аппарата (09:00)
 uint32_t endTimeToInt = end.hour * 3600 + end.minute * 60; // Время выключения аппарата (20:00)

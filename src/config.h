@@ -1,8 +1,13 @@
 #pragma once
 
 #include <stdint.h>
+#include <WiFi.h> 
+#include <ESPAsyncWebServer.h>
+#include <ArduinoJson.h>
 
 #include "enums.h"
+
+extern AsyncWebServer server;
 
 /** Pins */
 // extern uint8_t MOTOR_IN_1_PIN;
@@ -18,6 +23,10 @@ extern uint8_t LIGHT_SENSOR_PIN;
 
 /** General settings */
 extern uint32_t controlTime;
+
+/** WiFi config */
+extern char SSID[21];
+extern char PASSWORD[21];
 
 /** Sensors */
 extern bool hasSoilMoistureSensor;
