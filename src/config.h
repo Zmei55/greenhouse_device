@@ -4,10 +4,12 @@
 #include <WiFi.h> 
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
+#include <GyverDS18.h>
 
 #include "enums.h"
 
 extern AsyncWebServer server;
+extern GyverDS18Single term;
 
 /** Pins */
 // extern uint8_t MOTOR_IN_1_PIN;

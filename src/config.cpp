@@ -4,6 +4,8 @@
     AsyncWebServer server(80);
 #endif
 
+GyverDS18Single term(THERMOMETER_PIN);
+
 /** Pins */
 
 /** Настройка пинов для ESP32_C3 */

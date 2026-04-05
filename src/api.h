@@ -20,11 +20,24 @@ void apiHandler(){
         } end;
 
         data["soilMoisture"] = nullptr;
+        data["temperature"] = nullptr;
         data["deviceDateTime"] = nullptr;
         data["workingHours"] = nullptr;
 
-        char buf[] = "YYYY-MM-DDThh:mm:ss";
-        if (hasTimeSensor) data["deviceDateTime"] = rtc.now().toString(buf);
+        if (hasSoilMoistureSensor) {
+            data["soilMoisture"] = analogRead(SOIL_MOISTURE_PIN);
+        }
+
+        if (hasTemperatureSensor) {
+            term.requestTemp();
+            term.waitReady();
+            if (term.readTemp()) data["temperature"] = term.getTemp();
+        }
+
+        if (hasTimeSensor) {
+            char buf[] = "YYYY-MM-DDThh:mm:ss";
+            data["deviceDateTime"] = rtc.now().toString(buf);
+        }
 
         startTime["hour"] = start.hour;
         startTime["minute"] = start.minute;

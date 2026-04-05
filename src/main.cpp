@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <MyTimer.h>
-#include <GyverDS18.h>
 
 #include "config.h"
 #include "myUtils.h"
@@ -11,7 +10,6 @@
 
 MyTimer timer;
 MyUtils utils;
-GyverDS18Single term(THERMOMETER_PIN);
 
 bool isLedStripsOn; // Включено ли освещение (по ум: false)
 bool isWaterOn; // Включен ли полив (по ум: false)
