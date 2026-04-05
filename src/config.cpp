@@ -19,7 +19,12 @@ uint8_t LIGHT_SENSOR_PIN = 21;
 /** General settings */
 uint32_t controlTime = TimeApp::ONE_SECOND * 10;
 
-/** Sensors */
+/** Sensors
+ * true - датчик подключен и используется в работе
+ * false - датчик не подключен и не используется в работе
+ * При отключении датчика, связанный с ним код не выполняется, даже если сейчас рабочее время
+ * По умолчанию все датчики отключены и не используются в работе, для исключения ошибок при повторном включении аппарата
+ */
 bool hasSoilMoistureSensor = true;
 // bool hasSoilMoistureSensor = false;
 bool hasPhotoSensor = true;

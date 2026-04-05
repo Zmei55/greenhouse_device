@@ -14,8 +14,12 @@ GyverDS18Single term(THERMOMETER_PIN);
 
 bool isLedStripsOn; // Включено ли освещение (по ум: false)
 bool isWaterOn; // Включен ли полив (по ум: false)
+bool isMotorOn; // Включен ли полив (по ум: false)
+bool isWindowOpen; // Открыто ли окно (по ум: false)
 
-/** Одноразовая проверка всех датчиков при включении МК */
+/** Одноразовая проверка всех датчиков
+ * На данный момент не используется, так как будет происходить только при сохранении новых настроек, отправленных с приложения.
+ */
 void checkSensorsOnce() {
     /** Проверка времени, если время рабочее, то выполняется код */
     bool isWorkingHours = (utils.getNowTimeToInt(rtc.now()) >= startTimeToInt) && (utils.getNowTimeToInt(rtc.now()) <= endTimeToInt);
@@ -46,9 +50,13 @@ void checkSensorsOnce() {
             /** Текущая температура выше контрольной */
             bool isTemperatureHigh = term.getTemp() > controlTemperature;
 
-            if (isTemperatureHigh) {
-                Serial.print("Жарко!!!");
+            if (isTemperatureHigh && !isWindowOpen) {
+                // isMotorOn = true;
+                // isWindowOpen = true;
+                Serial.print("Жарко!!! ");
                 Serial.println(term.getTemp());
+                // Serial.print("Мотор: ");
+                // Serial.println(isMotorOn ? "вкл" : "выкл");
             }
         }
     }
@@ -58,6 +66,9 @@ void checkSensorsOnce() {
 void checkSensorsByControlTime() {
     timer.interval(controlTime, [](){
         Serial.println(term.getTemp());
+        // Serial.print("Окно: ");
+        // Serial.println(isWindowOpen ? "открыто" : "закрыто");
+
         /** Проверка времени, если время рабочее, то выполняется код */
         bool isWorkingHours = (utils.getNowTimeToInt(rtc.now()) >= startTimeToInt) && (utils.getNowTimeToInt(rtc.now()) <= endTimeToInt);
         if (isWorkingHours) {
@@ -94,7 +105,16 @@ void checkSensorsByControlTime() {
                 bool isTemperatureHigh = term.getTemp() > controlTemperature;
                 
                 if (isTemperatureHigh) {
-                    Serial.println("Жарко!!!");
+                    Serial.print("Жарко!!!");
+                    Serial.println(term.getTemp());
+
+                    bool isMotorOffAndWindowClosed = (isMotorOn == false) && (isWindowOpen == false);
+                    /** Если мотор не включен и окно не открыто, то включаем мотор */
+                    if (isMotorOffAndWindowClosed) {
+                        isMotorOn = true;
+                        Serial.print("Мотор: ");
+                        Serial.println(isMotorOn ? "вкл" : "выкл");
+                    }
                     // analogWrite(MOTOR_IN_1_PIN, 75);
                     // digitalWrite(MOTOR_IN_1_PIN, HIGH);
                     // digitalWrite(MOTOR_IN_2_PIN, LOW);
@@ -125,13 +145,11 @@ void setup() {
     term.requestTemp(); // Запрос на измерение температуры (необходимо для получения данных при первом вызове term.tick())
     isLedStripsOn = false;
     isWaterOn = false;
-
-    checkSensorsOnce();
+    isMotorOn = false;
+    isWindowOpen = false;
 }
 
 void loop() {
-    // checkSensorsOnce();
-
     checkSensorsByControlTime();
 
     /**
@@ -149,9 +167,13 @@ void loop() {
 
     /** Останавливает мотор через 5 секунд */
     /** После того как flag == true начинается отсчет */
-    // timer.timerWithFlag(TimeApp::ONE_SECOND * 5, &isWindowMotorEnabled, [](){
-    //     utils.disabledWindowMotor(&isWindowMotorEnabled);
-    // });
+    if (isMotorOn) {
+        timer.interval(TimeApp::ONE_SECOND * 5, [](){
+            isMotorOn = false;
+            Serial.print("Мотор: ");
+            Serial.println(isMotorOn ? "вкл" : "выкл");
+        });
+    }
 }
 
 /**
@@ -159,13 +181,15 @@ void loop() {
  * - при достижении определенной температуры активировать мотор для открытия окна
  *      - V получение данных с датчика температуры
  *      - если температура выше контрольной, то активировать мотор для открытия окна
- *      - через определенный промежуток времени (например, 10 секунд) остановить мотор,
+ *      - V через определенный промежуток времени (например, 10 секунд) остановить мотор,
  *        чтоб процесс открытия окна остановился
+ *        (в данный момент процесс синхронный, т.е. код останавливается на время работы мотора, нужно сделать асинхронно)
  * - при достижении определенной температуры активировать мотор для закрытия окна
  *      - V получение данных с датчика температуры
  *      - если температура ниже контрольной, то активировать мотор для закрытия окна
- *      - через определенный промежуток времени (например, 10 секунд) остановить мотор,
+ *      - V через определенный промежуток времени (например, 10 секунд) остановить мотор,
  *        чтоб процесс закрытия окна остановился
+ *        (в данный момент процесс синхронный, т.е. код останавливается на время работы мотора, нужно сделать асинхронно)
  * 
  * - таймер для отключения двигателя запускается не корректно,
  *   возможно флаг отрабатывает не верно (исправил, надо проверить)
