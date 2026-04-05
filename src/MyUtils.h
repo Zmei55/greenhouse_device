@@ -9,18 +9,38 @@ class MyUtils
 public:
     MyUtils();
 
-    /** Управляет освещением растений */
-    void lightingPlant();
+    /** Переводит время из DateTime в целое число
+     * @param time экземпляр класса DateTime
+     */
+    uint32_t getNowTimeToInt(const DateTime& time);
 
-    /** Включение полива при сухой почве */
-    void enablingWaterByMoisture(bool *flag);
+    /** Включение освещения
+     * @param flag включено ли освещение (bool)
+     */
+    void enablingLighting(bool *flag);
 
-    /** Выключение полива при сухой почве */
-    void disablingWaterByMoisture(bool *flag);
+    /** Выключение освещения
+     * @param flag включено ли освещение (bool)
+     */
+    void disablingLighting(bool *flag);
 
-    /** Переводит время из DateTime в целое число */
-    uint32_t getNowTimeToInt(DateTime time);
+    /** Включение полива
+     * @param flag включен ли полив (bool)
+     */
+    void enablingWatering(bool *flag);
 
-    /** Управление открыванием окна в зависимости от температуры */
-    void controlMotorByTemperature(bool *flag);
+    /** Выключение полива
+     * @param flag включен ли полив (bool)
+     */
+    void disablingWatering(bool *flag);
+
+    /** Включение мотора
+     * @param flag включен ли мотор (bool)
+     */
+    void enablingMotor(bool *flag);
+
+    /** Выключение мотора
+     * @param flag включен ли мотор (bool)
+     */
+    void disablingMotor(bool *flag);
 };
