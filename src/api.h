@@ -6,46 +6,48 @@
 void apiHandler(){
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
-        JsonDocument workingHours;
-        JsonDocument startTime;
-        JsonDocument endTime;
 
-        struct StartTime {
-            uint8_t hour = 9; // Час включения аппарата (09)
-            uint8_t minute = 0; // Минуты включения аппарата (00)
-        } start;
-        struct EndTime {
-            uint8_t hour = 20; // Час выключения аппарата (20)
-            uint8_t minute = 0; // Минуты включения аппарата (00)
-        } end;
-
+        data["sensors"] = nullptr;
         data["soilMoisture"] = nullptr;
         data["temperature"] = nullptr;
         data["deviceDateTime"] = nullptr;
         data["workingHours"] = nullptr;
 
+        /** Какие сенсоры включены, а какие выключены */
+        JsonObject sensors = data["sensors"].to<JsonObject>();
+        sensors["soilMoisture"] = hasSoilMoistureSensor;
+        sensors["photo"] = hasPhotoSensor;
+        sensors["time"] = hasTimeSensor;
+        sensors["temperature"] = hasTemperatureSensor;
+
+        /** Данные датчика влажности почвы */
         if (hasSoilMoistureSensor) {
             data["soilMoisture"] = analogRead(SOIL_MOISTURE_PIN);
         }
 
+        /** Данные датчика температуры */
         if (hasTemperatureSensor) {
             term.requestTemp();
             term.waitReady();
             if (term.readTemp()) data["temperature"] = term.getTemp();
         }
 
+        /** Данные датчика реального времени */
         if (hasTimeSensor) {
             char buf[] = "YYYY-MM-DDThh:mm:ss";
             data["deviceDateTime"] = rtc.now().toString(buf);
         }
 
-        startTime["hour"] = start.hour;
-        startTime["minute"] = start.minute;
-        endTime["hour"] = end.hour;
-        endTime["minute"] = end.minute;
-        workingHours["start"] = startTime;
-        workingHours["end"] = endTime;
-        data["workingHours"] = workingHours;
+        /** Рабочее время аппарата */
+        JsonObject workingHours = data["workingHours"].to<JsonObject>();
+
+        JsonObject startTime = workingHours["start"].to<JsonObject>();
+        startTime["hour"] = start.getHour();
+        startTime["minute"] = start.getMinute();
+
+        JsonObject endTime = workingHours["end"].to<JsonObject>();        
+        endTime["hour"] = end.getHour();
+        endTime["minute"] = end.getMinute();
 
         request->send(200, "application/json", data.as<String>());
     });

@@ -1,12 +1,21 @@
 #pragma once
 
 #include <stdint.h>
-#include <WiFi.h> 
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
 #include <GyverDS18.h>
+#include <WorkTime.h>
 
 #include "enums.h"
+
+#if defined(ESP32)
+#include <AsyncTCP.h>
+#include <WiFi.h>
+#elif defined(ESP8266)
+#include <ESP8266WiFi.h>
+#include <ESPAsyncTCP.h>
+#endif
+
 
 extern AsyncWebServer server;
 extern GyverDS18Single term;
@@ -44,5 +53,7 @@ extern uint16_t soilMoistureDryValue; // Значение, при котором
 extern uint16_t soilMoistureWetValue; // Значение, при котором выключается полив
 
 /** Time config */
+extern WorkTime start;
+extern WorkTime end;
 extern uint32_t startTimeToInt;
 extern uint32_t endTimeToInt;

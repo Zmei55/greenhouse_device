@@ -56,13 +56,8 @@ uint16_t soilMoistureDryValue = 3750;
 uint16_t soilMoistureWetValue = 3600;
 
 /** Time config */
-struct StartTime {
-    uint8_t hour = 9; // Час включения аппарата (09)
-    uint8_t minute = 0; // Минуты включения аппарата (00)
-} start;
-struct EndTime {
-    uint8_t hour = 20; // Час выключения аппарата (20)
-    uint8_t minute = 0; // Минуты включения аппарата (00)
-} end;
-uint32_t startTimeToInt = start.hour * 3600 + start.minute * 60; // Время включения аппарата (09:00)
-uint32_t endTimeToInt = end.hour * 3600 + end.minute * 60; // Время выключения аппарата (20:00)
+WorkTime start(9, 0); // Время начала работы аппарата (09:00)
+WorkTime end(20, 0); // Время окончания работы аппарата (20:00)
+
+uint32_t startTimeToInt = start.getHour() * 3600 + start.getMinute() * 60; // Время включения аппарата (09:00)
+uint32_t endTimeToInt = end.getMinute() * 3600 + end.getMinute() * 60; // Время выключения аппарата (20:00)
