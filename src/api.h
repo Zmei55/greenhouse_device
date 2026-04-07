@@ -4,6 +4,17 @@
 #include "ds3231.h"
 
 /**
+ * Получает даты и времени устройства (датчика реального времени DS3231) в формате json
+ * @return дату и время устройства (JsonDocument)
+ */
+JsonDocument getCurrentTimeAsJson() {
+    JsonDocument data;
+    char buf[] = "YYYY-MM-DDThh:mm:ss";
+    data["deviceDateTime"] = rtc.now().toString(buf);
+    return data;
+}
+
+/**
  * Получает рабочее время устройства в формате json
  * @return рабочее время устройства (JsonDocument)
  */
@@ -66,10 +77,7 @@ void apiHandler(){
 
     /** Отправка на клиент текущего времени устройства (датчика реального времени DS3231) */
     server.on("/time", HTTP_GET, [](AsyncWebServerRequest *request){
-        JsonDocument data;
-        char buf[] = "YYYY-MM-DDThh:mm:ss";
-        data["deviceDateTime"] = rtc.now().toString(buf);
-        request->send(200, "application/json", data.as<String>());
+        request->send(200, "application/json", getCurrentTimeAsJson().as<String>());
     });
 
     /**
@@ -79,8 +87,6 @@ void apiHandler(){
      * @return новую дату и время
      */
     server.on("/time", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
-        JsonDocument data;
-
         JsonArray body = json.as<JsonArray>();
         uint16_t newYear = body[0];
         uint8_t newMonth = body[1];
@@ -90,15 +96,20 @@ void apiHandler(){
         uint8_t newSecond = body[5];
         rtc.adjust(DateTime(newYear, newMonth, newDay, newHour, newMinute, newSecond));
 
-        char buf[] = "YYYY-MM-DDThh:mm:ss";
-        data["deviceDateTime"] = rtc.now().toString(buf);
-        request->send(200, "application/json", data.as<String>());
+        request->send(200, "application/json", getCurrentTimeAsJson().as<String>());
     });
 
+    /** Отправка на клиент рабочего времени устройства */
     server.on("/working-time", HTTP_GET, [](AsyncWebServerRequest *request){
         request->send(200, "application/json", getWorkingTimeAsJson().as<String>());
     });
 
+    /**
+     * Получение с клиента новой даты и времени
+     * Установка новой даты и времени
+     * @param json объект с временем начала и окончания рабочего времени
+     * @return новый объект
+     */
     server.on("/working-time", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){        
         JsonObject body = json.as<JsonObject>();
         uint8_t start_hour = body["start"]["hour"];
