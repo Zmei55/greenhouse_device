@@ -33,20 +33,11 @@ uint32_t controlTime = TimeApp::ONE_SECOND * 10;
 char SSID[21] = "greenhouse";
 char PASSWORD[21] = "";
 
-/** Sensors
- * true - датчик подключен и используется в работе
- * false - датчик не подключен и не используется в работе
- * При отключении датчика, связанный с ним код не выполняется, даже если сейчас рабочее время
- * По умолчанию все датчики отключены и не используются в работе, для исключения ошибок при повторном включении аппарата
- */
-bool hasSoilMoistureSensor = true;
-// bool hasSoilMoistureSensor = false;
-bool hasPhotoSensor = true;
-// bool hasPhotoSensor = false;
-bool hasTimeSensor = true;
-// bool hasTimeSensor = false;
-bool hasTemperatureSensor = true;
-// bool hasTemperatureSensor = false;
+/** Sensors */
+bool* hasSoilMoistureSensor = new bool(false);
+bool* hasPhotoSensor = new bool(false);
+bool* hasTimeSensor = new bool(false);
+bool* hasTemperatureSensor = new bool(false);
 
 /** Temperature config */
 float controlTemperature = 23.0;

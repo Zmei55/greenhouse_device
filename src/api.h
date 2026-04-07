@@ -34,6 +34,20 @@ JsonDocument getWorkingTimeAsJson() {
     return data;
 }
 
+/** 
+ * Получение состояния сенсоров
+ * true - включен
+ * false - выключен
+ */
+JsonDocument getSensorsValue() {
+    JsonDocument data;
+    data["soilMoisture"] = *hasSoilMoistureSensor;
+    data["photo"] = *hasPhotoSensor;
+    data["time"] = *hasTimeSensor;
+    data["temperature"] = *hasTemperatureSensor;
+    return data;
+}
+
 void apiHandler(){
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
@@ -45,26 +59,22 @@ void apiHandler(){
         data["workingHours"] = nullptr;
 
         /** Какие сенсоры включены, а какие выключены */
-        JsonObject sensors = data["sensors"].to<JsonObject>();
-        sensors["soilMoisture"] = hasSoilMoistureSensor;
-        sensors["photo"] = hasPhotoSensor;
-        sensors["time"] = hasTimeSensor;
-        sensors["temperature"] = hasTemperatureSensor;
+        data["sensors"] = getSensorsValue();
 
         /** Данные датчика влажности почвы */
-        if (hasSoilMoistureSensor) {
+        if (*hasSoilMoistureSensor) {
             data["soilMoisture"] = analogRead(SOIL_MOISTURE_PIN);
         }
 
         /** Данные датчика температуры */
-        if (hasTemperatureSensor) {
+        if (*hasTemperatureSensor) {
             term.requestTemp();
             term.waitReady();
             if (term.readTemp()) data["temperature"] = term.getTemp();
         }
 
         /** Данные датчика реального времени */
-        if (hasTimeSensor) {
+        if (*hasTimeSensor) {
             char buf[] = "YYYY-MM-DDThh:mm:ss";
             data["deviceDateTime"] = rtc.now().toString(buf);
         }
@@ -121,5 +131,26 @@ void apiHandler(){
         end->update(end_hour, end_minute);
 
         request->send(200, "application/json", getWorkingTimeAsJson().as<String>());
+    });
+
+    /** Отправка на клиент состояния сенсоров */
+    server.on("/sensors", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(200, "application/json", getSensorsValue().as<String>());
+    });
+
+    /**
+     * Получение с клиента новых значений для сенсоров
+     * Установка новых значений
+     * @param json объект с булевыми значениями
+     * @return новый объект
+     */
+    server.on("/sensors", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
+        JsonObject body = json.as<JsonObject>();
+        *hasSoilMoistureSensor = body["soilMoisture"];
+        *hasPhotoSensor = body["photo"];
+        *hasTimeSensor = body["time"];
+        *hasTemperatureSensor = body["temperature"];
+
+        request->send(200, "application/json", getSensorsValue().as<String>());
     });
 }

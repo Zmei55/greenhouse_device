@@ -39,11 +39,16 @@ extern uint32_t controlTime;
 extern char SSID[21];
 extern char PASSWORD[21];
 
-/** Sensors */
-extern bool hasSoilMoistureSensor;
-extern bool hasPhotoSensor;
-extern bool hasTimeSensor;
-extern bool hasTemperatureSensor;
+/** Sensors
+ * true - датчик подключен и используется в работе
+ * false - датчик не подключен и не используется в работе
+ * При отключении датчика, связанный с ним код не выполняется, даже если сейчас рабочее время
+ * По умолчанию все датчики отключены и не используются в работе, для исключения ошибок при повторном включении аппарата
+ */
+extern bool* hasSoilMoistureSensor;
+extern bool* hasPhotoSensor;
+extern bool* hasTimeSensor;
+extern bool* hasTemperatureSensor;
 
 /** Temperature config */
 extern float controlTemperature;
