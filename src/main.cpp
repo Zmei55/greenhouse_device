@@ -64,7 +64,7 @@ void checkSensorsOnce() {
 /** Работа всех датчиков по контрольному времени (повторяющийся интервал) */
 void checkSensorsByControlTime() {
     timer.interval(controlTime, [](){
-        Serial.println(term.getTemp());
+        // Serial.println(term.getTemp());
         // Serial.print("Окно: ");
         // Serial.println(isWindowOpen ? "открыто" : "закрыто");
 
@@ -135,7 +135,7 @@ void setup() {
     WiFi.softAP(SSID, PASSWORD);
 
     rtc.begin();
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); // Установка времени компиляции кода (можно закомментировать после первой загрузки)
+    rtc.adjust(DateTime(2026, 1, 1, 12, 0, 0)); // Установка времени компиляции кода (можно закомментировать после первой загрузки)
     
     pinMode(LIGHT_SENSOR_PIN, INPUT);
     pinMode(LED_STRIP_ONE_PIN, OUTPUT);
