@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <MyTimer.h>
+#include <MyUtils.h>
 
 #include "config.h"
-#include "myUtils.h"
 #include "lightSensor.h"
 #include "ds3231.h"
 #include "api.h"
