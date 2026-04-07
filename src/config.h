@@ -53,7 +53,7 @@ extern uint16_t soilMoistureDryValue; // Значение, при котором
 extern uint16_t soilMoistureWetValue; // Значение, при котором выключается полив
 
 /** Time config */
-extern WorkTime start;
-extern WorkTime end;
+extern WorkTime* start;
+extern WorkTime* end;
 extern uint32_t startTimeToInt;
 extern uint32_t endTimeToInt;
