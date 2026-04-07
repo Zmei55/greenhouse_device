@@ -3,6 +3,26 @@
 #include "config.h"
 #include "ds3231.h"
 
+/**
+ * Получает рабочее время устройства в формате json
+ * @return рабочее время устройства (JsonDocument)
+ */
+JsonDocument getWorkingTimeAsJson() {
+    JsonDocument data;
+    data["start"] = nullptr;
+    data["end"] = nullptr;
+
+    JsonObject startTime = data["start"].to<JsonObject>();
+    startTime["hour"] = start->getHour();
+    startTime["minute"] = start->getMinute();
+
+    JsonObject endTime = data["end"].to<JsonObject>();        
+    endTime["hour"] = end->getHour();
+    endTime["minute"] = end->getMinute();
+
+    return data;
+}
+
 void apiHandler(){
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
@@ -39,58 +59,47 @@ void apiHandler(){
         }
 
         /** Рабочее время аппарата */
-        JsonObject workingHours = data["workingHours"].to<JsonObject>();
-
-        JsonObject startTime = workingHours["start"].to<JsonObject>();
-        startTime["hour"] = start->getHour();
-        startTime["minute"] = start->getMinute();
-
-        JsonObject endTime = workingHours["end"].to<JsonObject>();        
-        endTime["hour"] = end->getHour();
-        endTime["minute"] = end->getMinute();
+        data["workingHours"] = getWorkingTimeAsJson();
 
         request->send(200, "application/json", data.as<String>());
     });
 
+    /** Отправка на клиент текущего времени устройства (датчика реального времени DS3231) */
     server.on("/time", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
+        char buf[] = "YYYY-MM-DDThh:mm:ss";
+        data["deviceDateTime"] = rtc.now().toString(buf);
+        request->send(200, "application/json", data.as<String>());
+    });
+
+    /**
+     * Получение с клиента новой даты и времени
+     * Установка новой даты и времени
+     * @param json массив с датой (2026, 1, 1, 12, 0, 0) -> 01.01.2026 12:00:00
+     * @return новую дату и время
+     */
+    server.on("/time", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
+        JsonDocument data;
+
+        JsonArray body = json.as<JsonArray>();
+        uint16_t newYear = body[0];
+        uint8_t newMonth = body[1];
+        uint8_t newDay = body[2];
+        uint8_t newHour = body[3];
+        uint8_t newMinute = body[4];
+        uint8_t newSecond = body[5];
+        rtc.adjust(DateTime(newYear, newMonth, newDay, newHour, newMinute, newSecond));
 
         char buf[] = "YYYY-MM-DDThh:mm:ss";
         data["deviceDateTime"] = rtc.now().toString(buf);
-
-        request->send(200, "application/json", data.as<String>());
-    });
-
-    server.on("/time", HTTP_POST, [](AsyncWebServerRequest *request){
-        JsonDocument data;
-
-        data["deviceDateTime"] = "Not implemented yet";
-
         request->send(200, "application/json", data.as<String>());
     });
 
     server.on("/working-time", HTTP_GET, [](AsyncWebServerRequest *request){
-        JsonDocument data;
-        data["workingHours"] = nullptr;
-
-        /** Новое рабочее время аппарата */
-        JsonObject newWorkingHours = data["workingHours"].to<JsonObject>();
-
-        JsonObject startTime = newWorkingHours["start"].to<JsonObject>();
-        startTime["hour"] = start->getHour();
-        startTime["minute"] = start->getMinute();
-
-        JsonObject endTime = newWorkingHours["end"].to<JsonObject>();        
-        endTime["hour"] = end->getHour();
-        endTime["minute"] = end->getMinute();
-
-        request->send(200, "application/json", data.as<String>());
+        request->send(200, "application/json", getWorkingTimeAsJson().as<String>());
     });
 
-    server.on("/working-time", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
-        JsonDocument data;
-        data["workingHours"] = nullptr;
-        
+    server.on("/working-time", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){        
         JsonObject body = json.as<JsonObject>();
         uint8_t start_hour = body["start"]["hour"];
         uint8_t start_minute = body["start"]["minute"];
@@ -100,17 +109,6 @@ void apiHandler(){
         start->update(start_hour, start_minute);
         end->update(end_hour, end_minute);
 
-        /** Новое рабочее время аппарата */
-        JsonObject newWorkingHours = data["workingHours"].to<JsonObject>();
-
-        JsonObject startTime = newWorkingHours["start"].to<JsonObject>();
-        startTime["hour"] = start->getHour();
-        startTime["minute"] = start->getMinute();
-
-        JsonObject endTime = newWorkingHours["end"].to<JsonObject>();        
-        endTime["hour"] = end->getHour();
-        endTime["minute"] = end->getMinute();
-
-        request->send(200, "application/json", data.as<String>());
+        request->send(200, "application/json", getWorkingTimeAsJson().as<String>());
     });
 }
