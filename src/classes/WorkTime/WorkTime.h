@@ -36,6 +36,9 @@ class WorkTime {
     /** Возвращает значение минут */
     uint8_t getMinute();
 
+    /** Возвращает значение пустой объект или нет */
+    bool isEmpty();
+
     private:
     uint8_t _hour;
     uint8_t _minute;

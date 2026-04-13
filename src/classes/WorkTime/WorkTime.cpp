@@ -24,3 +24,7 @@ uint8_t WorkTime::getHour() {
 uint8_t WorkTime::getMinute() {
     return this->_minute;
 }
+
+bool WorkTime::isEmpty() {
+    return (this->_hour == 0 && this->_minute == 0) ? true : false;
+}
