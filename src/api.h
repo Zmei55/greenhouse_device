@@ -43,7 +43,6 @@ JsonDocument getSensorsValue() {
     JsonDocument data;
     data["soilMoisture"] = *hasSoilMoistureSensor;
     data["photo"] = *hasPhotoSensor;
-    data["time"] = *hasTimeSensor;
     data["temperature"] = *hasTemperatureSensor;
     return data;
 }
@@ -52,14 +51,9 @@ void apiHandler(){
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
 
-        data["sensors"] = nullptr;
         data["soilMoisture"] = nullptr;
         data["temperature"] = nullptr;
         data["deviceDateTime"] = nullptr;
-        data["workingHours"] = nullptr;
-
-        /** Какие сенсоры включены, а какие выключены */
-        data["sensors"] = getSensorsValue();
 
         /** Данные датчика влажности почвы */
         if (*hasSoilMoistureSensor) {
@@ -78,9 +72,6 @@ void apiHandler(){
             char buf[] = "YYYY-MM-DDThh:mm:ss";
             data["deviceDateTime"] = rtc.now().toString(buf);
         }
-
-        /** Рабочее время аппарата */
-        data["workingHours"] = getWorkingTimeAsJson();
 
         request->send(200, "application/json", data.as<String>());
     });
@@ -148,9 +139,79 @@ void apiHandler(){
         JsonObject body = json.as<JsonObject>();
         *hasSoilMoistureSensor = body["soilMoisture"];
         *hasPhotoSensor = body["photo"];
-        *hasTimeSensor = body["time"];
         *hasTemperatureSensor = body["temperature"];
 
         request->send(200, "application/json", getSensorsValue().as<String>());
+    });
+
+    /** Отправка на клиент настроек */
+    server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
+        JsonDocument data;
+
+        /** Какие сенсоры включены, а какие выключены */
+        data["sensors"] = getSensorsValue();
+
+        /** Получение значения температуры, для управления ч-либо */
+        data["controlTemperature"] = *controlTemperature;
+
+        /** Получение значения интервала проверки сенсоров */
+        data["controlTime"] = *controlTime;
+
+        /** Рабочее время аппарата */
+        data["workingHours"] = nullptr;
+        if (!start->isEmpty() && !end->isEmpty()) {
+            data["workingHours"] = getWorkingTimeAsJson();
+        }
+
+        request->send(200, "application/json", data.as<String>());
+    });
+
+    /**
+     * Получение с клиента новых настроек
+     * Установка новых настроек
+     * @param json объект с новыми настройками
+     * @return новый объект настроек
+     */
+    server.on("/settings", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
+        JsonDocument data;
+
+        JsonObject body = json.as<JsonObject>();
+        /** Включение / выключение сенсоров */
+        *hasSoilMoistureSensor = body["soilMoisture"];
+        *hasPhotoSensor = body["photo"];
+        *hasTemperatureSensor = body["temperature"];
+        /** Установка значение контрольной температуры */
+        *controlTemperature = body["controlTemperature"];
+        /** Установка значение контрольного времени (интервала проверки показаний датчиков) */
+        *controlTime = body["controlTime"];
+
+        /** Установка рабочего времени */
+        bool workingHours = body["workingHours"];
+        if (!workingHours) {
+            uint8_t start_hour = body["workingHours"]["start"]["hour"];
+            uint8_t start_minute = body["workingHours"]["start"]["minute"];
+            uint8_t end_hour = body["workingHours"]["end"]["hour"];
+            uint8_t end_minute = body["workingHours"]["end"]["minute"];
+
+            start->update(start_hour, start_minute);
+            end->update(end_hour, end_minute);
+        }
+
+        /** Какие сенсоры включены, а какие выключены */
+        data["sensors"] = getSensorsValue();
+
+        /** Получение значения температуры, для управления ч-либо */
+        data["controlTemperature"] = *controlTemperature;
+
+        /** Получение значения интервала проверки сенсоров */
+        data["controlTime"] = *controlTime;
+
+        /** Рабочее время аппарата */
+        data["workingHours"] = nullptr;
+        if (!start->isEmpty() && !end->isEmpty()) {
+            data["workingHours"] = getWorkingTimeAsJson();
+        }
+
+        request->send(200, "application/json", data.as<String>());
     });
 }
