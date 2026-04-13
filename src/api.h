@@ -237,9 +237,15 @@ void apiHandler(){
         utils.disablingWatering(&isWaterOn);
     });
 
-    /** Тестирование мотора (открытие окна) */
-    server.on("/tests/window-motor/on", HTTP_GET, [](AsyncWebServerRequest *request){});
+    /**
+     * Тестирование мотора (открытие окна)
+     * @param json объект с указанием времени, в течении которого мотор открывает окно (в секундах)
+     */
+    server.on("/tests/window-motor/on", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){});
 
-    /** Тестирование мотора (закрытие окна) */
-    server.on("/tests/window-motor/off", HTTP_GET, [](AsyncWebServerRequest *request){});
+    /**
+     * Тестирование мотора (закрытие окна)
+     * @param json объект с новыми настройками
+     */
+    server.on("/tests/window-motor/off", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){});
 }
