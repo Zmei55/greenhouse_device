@@ -27,7 +27,7 @@ GyverDS18Single term(THERMOMETER_PIN);
 // #endif
 
 /** General settings */
-uint32_t controlTime = TimeApp::ONE_SECOND * 10;
+uint32_t* controlTime = new uint32_t(TimeApp::ONE_SECOND * 10); // Интервал проверки сенсоров (по умолчанию 10 секунд)
 
 /** WiFi config */
 char SSID[21] = "greenhouse";
@@ -40,15 +40,15 @@ bool* hasTimeSensor = new bool(false);
 bool* hasTemperatureSensor = new bool(false);
 
 /** Temperature config */
-float controlTemperature = 23.0;
+float* controlTemperature;
 
 /** Soil moisture config */
 uint16_t soilMoistureDryValue = 3750;
 uint16_t soilMoistureWetValue = 3600;
 
 /** Time config */
-WorkTime* start = new WorkTime(9, 0); // Время начала работы аппарата (09:00)
-WorkTime* end = new WorkTime(20, 0); // Время окончания работы аппарата (20:00)
+WorkTime* start = new WorkTime(); // Время начала работы аппарата (09:00)
+WorkTime* end = new WorkTime(); // Время окончания работы аппарата (20:00)
 
 uint32_t startTimeToInt = start->getHour() * 3600 + start->getMinute() * 60; // Время включения аппарата (09:00)
 uint32_t endTimeToInt = end->getHour() * 3600 + end->getMinute() * 60; // Время выключения аппарата (20:00)

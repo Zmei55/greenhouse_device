@@ -47,7 +47,7 @@ void checkSensorsOnce() {
         /** Если датчик температуры подключен, и данные с датчика получены, то выполняется код */
         if (hasTemperatureSensor && term.waitReady() && term.readTemp()) {
             /** Текущая температура выше контрольной */
-            bool isTemperatureHigh = term.getTemp() > controlTemperature;
+            bool isTemperatureHigh = term.getTemp() > *controlTemperature;
 
             if (isTemperatureHigh && !isWindowOpen) {
                 // isMotorOn = true;
@@ -63,7 +63,7 @@ void checkSensorsOnce() {
 
 /** Работа всех датчиков по контрольному времени (повторяющийся интервал) */
 void checkSensorsByControlTime() {
-    timer.interval(controlTime, [](){
+    timer.interval(*controlTime, [](){
         // Serial.println(term.getTemp());
         // Serial.print("Окно: ");
         // Serial.println(isWindowOpen ? "открыто" : "закрыто");
@@ -101,7 +101,7 @@ void checkSensorsByControlTime() {
             /** Если датчик температуры подключен, запрос данных с датчика, ожидание данных, данные с датчика получены, то выполняется код */
             if (hasTemperatureSensor && term.requestTemp() && term.waitReady() && term.readTemp()) {
                 /** Текущая температура выше контрольной */
-                bool isTemperatureHigh = term.getTemp() > controlTemperature;
+                bool isTemperatureHigh = term.getTemp() > *controlTemperature;
                 
                 if (isTemperatureHigh) {
                     Serial.print("Жарко!!!");
@@ -130,8 +130,6 @@ void setup() {
     Serial.begin(115200);
     Wire.begin();
     WiFi.mode(WIFI_AP);
-    char SSID[21];
-    char PASSWORD[21];
     WiFi.softAP(SSID, PASSWORD);
 
     rtc.begin();

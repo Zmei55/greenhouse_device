@@ -33,7 +33,7 @@ extern uint8_t THERMOMETER_PIN;
 extern uint8_t LIGHT_SENSOR_PIN;
 
 /** General settings */
-extern uint32_t controlTime;
+extern uint32_t *controlTime;
 
 /** WiFi config */
 extern char SSID[21];
@@ -51,7 +51,7 @@ extern bool* hasTimeSensor;
 extern bool* hasTemperatureSensor;
 
 /** Temperature config */
-extern float controlTemperature;
+extern float *controlTemperature;
 
 /** Soil moisture config */
 extern uint16_t soilMoistureDryValue; // Значение, при котором включается полив
