@@ -214,4 +214,32 @@ void apiHandler(){
 
         request->send(200, "application/json", data.as<String>());
     });
+
+    /** Тестирование оборудования */
+
+    /** Тестирование освещения (включение светодиодной ленты) */
+    server.on("/tests/led-strips/on", HTTP_GET, [](AsyncWebServerRequest *request){
+        utils.enablingLighting(&isLedStripsOn);
+    });
+
+    /** Тестирование освещения (выключение светодиодной ленты) */
+    server.on("/tests/led-strips/off", HTTP_GET, [](AsyncWebServerRequest *request){
+        utils.disablingLighting(&isLedStripsOn);
+    });
+
+    /** Тестирование водяного насоса (включение насоса) */
+    server.on("/tests/water-pump/on", HTTP_GET, [](AsyncWebServerRequest *request){
+        utils.enablingWatering(&isWaterOn);
+    });
+
+    /** Тестирование водяного насоса (выключение насоса) */
+    server.on("/tests/water-pump/off", HTTP_GET, [](AsyncWebServerRequest *request){
+        utils.disablingWatering(&isWaterOn);
+    });
+
+    /** Тестирование мотора (открытие окна) */
+    server.on("/tests/window-motor/on", HTTP_GET, [](AsyncWebServerRequest *request){});
+
+    /** Тестирование мотора (закрытие окна) */
+    server.on("/tests/window-motor/off", HTTP_GET, [](AsyncWebServerRequest *request){});
 }
