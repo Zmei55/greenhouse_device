@@ -220,21 +220,25 @@ void apiHandler(){
     /** Тестирование освещения (включение светодиодной ленты) */
     server.on("/tests/led-strips/on", HTTP_GET, [](AsyncWebServerRequest *request){
         utils.enablingLighting(&isLedStripsOn);
+        request->send(200);
     });
 
     /** Тестирование освещения (выключение светодиодной ленты) */
     server.on("/tests/led-strips/off", HTTP_GET, [](AsyncWebServerRequest *request){
         utils.disablingLighting(&isLedStripsOn);
+        request->send(200);
     });
 
     /** Тестирование водяного насоса (включение насоса) */
     server.on("/tests/water-pump/on", HTTP_GET, [](AsyncWebServerRequest *request){
         utils.enablingWatering(&isWaterOn);
+        request->send(200);
     });
 
     /** Тестирование водяного насоса (выключение насоса) */
     server.on("/tests/water-pump/off", HTTP_GET, [](AsyncWebServerRequest *request){
         utils.disablingWatering(&isWaterOn);
+        request->send(200);
     });
 
     /**
