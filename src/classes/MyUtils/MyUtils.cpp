@@ -34,6 +34,6 @@ void MyUtils::disablingWatering(bool *flag) {
     *flag = false;
 }
 
-void MyUtils::enablingMotor(bool *flag) {};
+void MyUtils::openingWindow(bool *flag) {};
 
-void MyUtils::disablingMotor(bool *flag) {};
+void MyUtils::closingWindow(bool *flag) {};

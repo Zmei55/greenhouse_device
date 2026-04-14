@@ -34,13 +34,13 @@ public:
      */
     void disablingWatering(bool *flag);
 
-    /** Включение мотора
+    /** Открывание окна
      * @param flag включен ли мотор (bool)
      */
-    void enablingMotor(bool *flag);
+    void openingWindow(bool *flag);
 
-    /** Выключение мотора
+    /** Закрывание окна
      * @param flag включен ли мотор (bool)
      */
-    void disablingMotor(bool *flag);
+    void closingWindow(bool *flag);
 };
