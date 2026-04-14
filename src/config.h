@@ -58,7 +58,6 @@ extern char PASSWORD[21];
  */
 extern bool *hasSoilMoistureSensor; // Датчик влажности почвы
 extern bool *hasPhotoSensor; // Датчик освещённости
-extern bool *hasTimeSensor; // Датчик реального времени
 extern bool *hasTemperatureSensor;  // Датчик температуры
 
 /** Time config */

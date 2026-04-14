@@ -68,10 +68,8 @@ void apiHandler(){
         }
 
         /** Данные датчика реального времени */
-        if (*hasTimeSensor) {
-            char buf[] = "YYYY-MM-DDThh:mm:ss";
-            data["deviceDateTime"] = rtc.now().toString(buf);
-        }
+        char buf[] = "YYYY-MM-DDThh:mm:ss";
+        data["deviceDateTime"] = rtc.now().toString(buf);
 
         request->send(200, "application/json", data.as<String>());
     });

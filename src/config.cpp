@@ -46,7 +46,6 @@ char PASSWORD[21] = "";
 /** Sensors */
 bool *hasSoilMoistureSensor = new bool(false);
 bool *hasPhotoSensor = new bool(false);
-bool *hasTimeSensor = new bool(false);
 bool *hasTemperatureSensor = new bool(false);
 
 /** Time config */
