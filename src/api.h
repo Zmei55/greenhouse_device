@@ -245,7 +245,7 @@ void apiHandler(){
      * Тестирование мотора (открытие окна)
      * @param json объект с указанием времени, в течении которого мотор открывает окно (в секундах)
      */
-    server.on("/tests/window-motor/open", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
+    server.on("/tests/window/open", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
         JsonObject body = json.as<JsonObject>();
         uint8_t *runningWindowMotorTime = body["runningTime"];
         utils.openingWindow(&isWindowOpen);
@@ -257,7 +257,7 @@ void apiHandler(){
      * Тестирование мотора (закрытие окна)
      * @param json объект с новыми настройками
      */
-    server.on("/tests/window-motor/close", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
+    server.on("/tests/window/close", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
         JsonObject body = json.as<JsonObject>();
         uint8_t *runningWindowMotorTime = body["runningTime"];
         utils.closingWindow(&isWindowOpen);
