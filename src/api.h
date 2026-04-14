@@ -215,7 +215,7 @@ void apiHandler(){
         request->send(200, "application/json", data.as<String>());
     });
 
-    /** Тестирование оборудования */
+    /** TESTS: Тестирование оборудования */
 
     /** Тестирование освещения (включение светодиодной ленты) */
     server.on("/tests/led-strips/on", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -241,11 +241,23 @@ void apiHandler(){
      * Тестирование мотора (открытие окна)
      * @param json объект с указанием времени, в течении которого мотор открывает окно (в секундах)
      */
-    server.on("/tests/window-motor/on", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){});
+    server.on("/tests/window-motor/open", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
+        JsonObject body = json.as<JsonObject>();
+        uint8_t *runningWindowMotorTime = body["runningTime"];
+        utils.openingWindow(&isWindowOpen);
+
+        request->send(200);
+    });
 
     /**
      * Тестирование мотора (закрытие окна)
      * @param json объект с новыми настройками
      */
-    server.on("/tests/window-motor/off", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){});
+    server.on("/tests/window-motor/close", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
+        JsonObject body = json.as<JsonObject>();
+        uint8_t *runningWindowMotorTime = body["runningTime"];
+        utils.closingWindow(&isWindowOpen);
+
+        request->send(200);
+    });
 }
