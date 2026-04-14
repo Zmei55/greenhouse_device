@@ -31,7 +31,7 @@ uint32_t *controlTime = new uint32_t(TimeApp::ONE_SECOND * 10);
 float *controlTemperature = new float(24.0);
 uint16_t soilMoistureDryValue = 3750;
 uint16_t soilMoistureWetValue = 3600;
-uint32_t *runningWindowMotorTime = new uint32_t(0);
+uint32_t *runningWindowMotorTime = new uint32_t(5); // Время, в течение которого мотор открывает/закрывает окно (в секундах)
 
 /** WiFi config */
 char SSID[21] = "greenhouse";
