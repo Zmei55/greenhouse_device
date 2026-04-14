@@ -1,20 +1,10 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <MyTimer.h>
-#include <MyUtils.h>
 
 #include "config.h"
 #include "lightSensor.h"
 #include "ds3231.h"
 #include "api.h"
-
-MyTimer timer;
-MyUtils utils;
-
-bool isLedStripsOn; // Включено ли освещение (по ум: false)
-bool isWaterOn; // Включен ли полив (по ум: false)
-bool isMotorOn; // Включен ли полив (по ум: false)
-bool isWindowOpen; // Открыто ли окно (по ум: false)
 
 /** Одноразовая проверка всех датчиков
  * На данный момент не используется, так как будет происходить только при сохранении новых настроек, отправленных с приложения.
@@ -30,7 +20,7 @@ void checkSensorsOnce() {
             
             /** Если естественного освещения не достаточно, то выполняется код... */
             if (isDark) {
-                utils.enablingLighting(&isLedStripsOn);
+                utils.enablingLighting(isLedStripsOn);
             }
         }
 
@@ -40,7 +30,7 @@ void checkSensorsOnce() {
             bool isSoilDry = (analogRead(SOIL_MOISTURE_PIN) > soilMoistureDryValue);
 
             if (isSoilDry) {
-                utils.enablingWatering(&isWaterOn);
+                utils.enablingWatering(isWaterOn);
             }
         }
 
@@ -49,7 +39,7 @@ void checkSensorsOnce() {
             /** Текущая температура выше контрольной */
             bool isTemperatureHigh = term.getTemp() > *controlTemperature;
 
-            if (isTemperatureHigh && !isWindowOpen) {
+            if (isTemperatureHigh && !*isWindowOpen) {
                 // isMotorOn = true;
                 // isWindowOpen = true;
                 Serial.print("Жарко!!! ");
@@ -74,27 +64,27 @@ void checkSensorsByControlTime() {
             Serial.println("Работаем");
             /** Если датчик освещенности подключен, то выполняется код... */
             if (hasPhotoSensor) {
-                bool isDarkAndLedStripsOff = (getLightSensorValue() == true) && (isLedStripsOn == false);
-                bool isLightAndLedStripsOn = (getLightSensorValue() == false) && (isLedStripsOn == true);
+                bool isDarkAndLedStripsOff = (getLightSensorValue() == true) && (*isLedStripsOn == false);
+                bool isLightAndLedStripsOn = (getLightSensorValue() == false) && (*isLedStripsOn == true);
                 
                 /** Если естественного освещения не достаточно, то выполняется код... */
                 if (isDarkAndLedStripsOff) {
-                    utils.enablingLighting(&isLedStripsOn);
+                    utils.enablingLighting(isLedStripsOn);
                 }
 
                 /** Если естественного освещения достаточно, то выполняется код... */
                 if (isLightAndLedStripsOn) {
-                    utils.disablingLighting(&isLedStripsOn);
+                    utils.disablingLighting(isLedStripsOn);
                 }
             }
 
             /** Если датчик влажности почвы подключен, то выполняется код */
             if (hasSoilMoistureSensor) {
                 /** Почва сухая и полив выключен */
-                bool isSoilDryAndWateringOff = (analogRead(SOIL_MOISTURE_PIN) > soilMoistureDryValue) && (isWaterOn == false);
+                bool isSoilDryAndWateringOff = (analogRead(SOIL_MOISTURE_PIN) > soilMoistureDryValue) && (*isWaterOn == false);
 
                 if (isSoilDryAndWateringOff) {
-                    utils.enablingWatering(&isWaterOn);
+                    utils.enablingWatering(isWaterOn);
                 }
             }
 
@@ -107,10 +97,10 @@ void checkSensorsByControlTime() {
                     Serial.print("Жарко!!!");
                     Serial.println(term.getTemp());
 
-                    bool isMotorOffAndWindowClosed = (isMotorOn == false) && (isWindowOpen == false);
+                    bool isMotorOffAndWindowClosed = (*isMotorOn == false) && (*isWindowOpen == false);
                     /** Если мотор не включен и окно не открыто, то включаем мотор */
                     if (isMotorOffAndWindowClosed) {
-                        isMotorOn = true;
+                        *isMotorOn = true;
                         Serial.print("Мотор: ");
                         Serial.println(isMotorOn ? "вкл" : "выкл");
                     }
@@ -145,10 +135,6 @@ void setup() {
     
     term.setResolution(12); // Установка разрешения датчика температуры (9-12 бит, чем выше, тем точнее, но дольше измерение)
     term.requestTemp(); // Запрос на измерение температуры (необходимо для получения данных при первом вызове term.tick())
-    isLedStripsOn = false;
-    isWaterOn = false;
-    isMotorOn = false;
-    isWindowOpen = false;
 
     apiHandler();
 
@@ -162,12 +148,12 @@ void loop() {
      * Проверка уровня влажности почвы каждую секунду после включения полива
      * Если влажность достаточная, то полив отключается, даже если сейчас не рабочее время
      */
-    timer.intervalWithFlag(TimeApp::ONE_SECOND, &isWaterOn, [](){
+    timer.intervalWithFlag(TimeApp::ONE_SECOND, isWaterOn, [](){
         /** Почва влажная и полив включен */
-        bool isSoilWetAndWateringOn = (analogRead(SOIL_MOISTURE_PIN) < soilMoistureWetValue) && (isWaterOn == true);
+        bool isSoilWetAndWateringOn = (analogRead(SOIL_MOISTURE_PIN) < soilMoistureWetValue) && (*isWaterOn == true);
         
         if (isSoilWetAndWateringOn) {
-            utils.disablingWatering(&isWaterOn);
+            utils.disablingWatering(isWaterOn);
         }
     });
 
@@ -175,7 +161,7 @@ void loop() {
     /** После того как flag == true начинается отсчет */
     if (isMotorOn) {
         timer.interval(TimeApp::ONE_SECOND * 5, [](){
-            isMotorOn = false;
+            *isMotorOn = false;
             Serial.print("Мотор: ");
             Serial.println(isMotorOn ? "вкл" : "выкл");
         });

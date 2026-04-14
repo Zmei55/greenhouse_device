@@ -4,9 +4,11 @@
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
 #include <GyverDS18.h>
-#include <WorkTime.h>
+#include <MyTimer.h>
 
 #include "enums.h"
+#include "classes/MyUtils/MyUtils.h"
+#include "classes/WorkTime/WorkTime.h"
 
 #if defined(ESP32)
 #include <AsyncTCP.h>
@@ -16,7 +18,8 @@
 #include <ESPAsyncTCP.h>
 #endif
 
-
+extern MyTimer timer;
+extern MyUtils utils;
 extern AsyncWebServer server;
 extern GyverDS18Single term;
 
@@ -37,6 +40,11 @@ extern uint32_t *controlTime; // Интервал проверки показа�
 extern float *controlTemperature; // Температура, при которой открывается окно (если датчик температуры подключен и используется в работе)
 extern uint16_t soilMoistureDryValue; // Значение датчика влажности почвы, при котором включается полив
 extern uint16_t soilMoistureWetValue; // Значение датчика влажности почвы, при котором выключается полив
+extern uint32_t *runningWindowMotorTime; // Время, в течение которого мотор открывает/закрывает окно (в секундах)
+extern bool *isLedStripsOn; // Включено ли освещение (по ум: false)
+extern bool *isWaterOn; // Включен ли полив (по ум: false)
+extern bool *isMotorOn; // Включен ли полив (по ум: false)
+extern bool *isWindowOpen; // Открыто ли окно (по ум: false)
 
 /** WiFi config */
 extern char SSID[21];

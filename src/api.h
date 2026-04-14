@@ -219,25 +219,25 @@ void apiHandler(){
 
     /** Тестирование освещения (включение светодиодной ленты) */
     server.on("/tests/led-strips/on", HTTP_GET, [](AsyncWebServerRequest *request){
-        utils.enablingLighting(&isLedStripsOn);
+        utils.enablingLighting(isLedStripsOn);
         request->send(200);
     });
 
     /** Тестирование освещения (выключение светодиодной ленты) */
     server.on("/tests/led-strips/off", HTTP_GET, [](AsyncWebServerRequest *request){
-        utils.disablingLighting(&isLedStripsOn);
+        utils.disablingLighting(isLedStripsOn);
         request->send(200);
     });
 
     /** Тестирование водяного насоса (включение насоса) */
     server.on("/tests/water-pump/on", HTTP_GET, [](AsyncWebServerRequest *request){
-        utils.enablingWatering(&isWaterOn);
+        utils.enablingWatering(isWaterOn);
         request->send(200);
     });
 
     /** Тестирование водяного насоса (выключение насоса) */
     server.on("/tests/water-pump/off", HTTP_GET, [](AsyncWebServerRequest *request){
-        utils.disablingWatering(&isWaterOn);
+        utils.disablingWatering(isWaterOn);
         request->send(200);
     });
 
@@ -247,8 +247,8 @@ void apiHandler(){
      */
     server.on("/tests/window/open", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
         JsonObject body = json.as<JsonObject>();
-        uint8_t *runningWindowMotorTime = body["runningTime"];
-        utils.openingWindow(&isWindowOpen);
+        *runningWindowMotorTime = body["runningTime"];
+        utils.openingWindow(isWindowOpen);
 
         request->send(200);
     });
@@ -259,8 +259,8 @@ void apiHandler(){
      */
     server.on("/tests/window/close", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
         JsonObject body = json.as<JsonObject>();
-        uint8_t *runningWindowMotorTime = body["runningTime"];
-        utils.closingWindow(&isWindowOpen);
+        *runningWindowMotorTime = body["runningTime"];
+        utils.closingWindow(isWindowOpen);
 
         request->send(200);
     });

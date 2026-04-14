@@ -4,6 +4,8 @@
     AsyncWebServer server(80);
 #endif
 
+MyTimer timer;
+MyUtils utils;
 GyverDS18Single term(THERMOMETER_PIN);
 
 /** Pins */
@@ -31,7 +33,11 @@ uint32_t *controlTime = new uint32_t(TimeApp::ONE_SECOND * 10);
 float *controlTemperature = new float(24.0);
 uint16_t soilMoistureDryValue = 3750;
 uint16_t soilMoistureWetValue = 3600;
-uint32_t *runningWindowMotorTime = new uint32_t(5); // Время, в течение которого мотор открывает/закрывает окно (в секундах)
+uint32_t *runningWindowMotorTime = new uint32_t(5);
+bool *isLedStripsOn = new bool(false);
+bool *isWaterOn = new bool(false);
+bool *isMotorOn = new bool(false);
+bool *isWindowOpen = new bool(false);
 
 /** WiFi config */
 char SSID[21] = "greenhouse";
