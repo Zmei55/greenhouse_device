@@ -51,6 +51,13 @@ JsonDocument getSensorsValue() {
 }
 
 void apiHandler(){
+    server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request){
+        JsonDocument data;
+        data["isLogged"] = true;
+        
+        request->send(200, "application/json", data.as<String>());
+    });
+
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
         char buf[] = "YYYY-MM-DDThh:mm:ss";
