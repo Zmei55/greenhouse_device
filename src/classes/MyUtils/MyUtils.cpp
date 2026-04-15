@@ -7,7 +7,7 @@
 MyUtils::MyUtils() {}
 
 uint32_t MyUtils::getNowTimeToInt(const DateTime& time) {
-    return time.hour() * 3600 + time.minute() * 60 + time.second();
+    return time.hour() * 3600 + time.minute() * 60;
 }
 
 void MyUtils::enablingLighting(bool *flag) {
@@ -34,6 +34,6 @@ void MyUtils::disablingWatering(bool *flag) {
     *flag = false;
 }
 
-void MyUtils::enablingMotor(bool *flag) {};
+void MyUtils::openingWindow(bool *flag) {};
 
-void MyUtils::disablingMotor(bool *flag) {};
+void MyUtils::closingWindow(bool *flag) {};
