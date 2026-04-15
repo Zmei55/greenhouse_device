@@ -61,6 +61,7 @@ extern bool *hasPhotoSensor; // Датчик освещённости
 extern bool *hasTemperatureSensor;  // Датчик температуры
 
 /** Time config */
+extern bool *isWorkTimeEnabled; // Включено ли рабочее время
 extern WorkTime *start; // Время начала работы аппарата
 extern WorkTime *end; // Время окончания работы аппарата
 extern uint32_t startTimeToInt; // Время начала работы аппарата в виде целого числа (секунды с 00:00:00)

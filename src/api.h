@@ -20,16 +20,19 @@ JsonDocument getCurrentTimeAsJson() {
  */
 JsonDocument getWorkingTimeAsJson() {
     JsonDocument data;
+    data["isEnabled"] = *isWorkTimeEnabled;
     data["start"] = nullptr;
     data["end"] = nullptr;
 
-    JsonObject startTime = data["start"].to<JsonObject>();
-    startTime["hour"] = start->getHour();
-    startTime["minute"] = start->getMinute();
+    if (*isWorkTimeEnabled) {
+        JsonObject startTime = data["start"].to<JsonObject>();
+        startTime["hour"] = start->getHour();
+        startTime["minute"] = start->getMinute();
 
-    JsonObject endTime = data["end"].to<JsonObject>();        
-    endTime["hour"] = end->getHour();
-    endTime["minute"] = end->getMinute();
+        JsonObject endTime = data["end"].to<JsonObject>();        
+        endTime["hour"] = end->getHour();
+        endTime["minute"] = end->getMinute();
+    }
 
     return data;
 }
@@ -50,10 +53,11 @@ JsonDocument getSensorsValue() {
 void apiHandler(){
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
+        char buf[] = "YYYY-MM-DDThh:mm:ss";
 
         data["soilMoisture"] = nullptr;
         data["temperature"] = nullptr;
-        data["deviceDateTime"] = nullptr;
+        data["deviceDateTime"] = rtc.now().toString(buf); // Данные датчика реального времени
 
         /** Данные датчика влажности почвы */
         if (*hasSoilMoistureSensor) {
@@ -66,10 +70,6 @@ void apiHandler(){
             term.waitReady();
             if (term.readTemp()) data["temperature"] = term.getTemp();
         }
-
-        /** Данные датчика реального времени */
-        char buf[] = "YYYY-MM-DDThh:mm:ss";
-        data["deviceDateTime"] = rtc.now().toString(buf);
 
         request->send(200, "application/json", data.as<String>());
     });
@@ -111,13 +111,17 @@ void apiHandler(){
      */
     server.on("/working-time", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){        
         JsonObject body = json.as<JsonObject>();
-        uint8_t start_hour = body["start"]["hour"];
-        uint8_t start_minute = body["start"]["minute"];
-        uint8_t end_hour = body["end"]["hour"];
-        uint8_t end_minute = body["end"]["minute"];
+        *isWorkTimeEnabled = body["isEnabled"];
+        
+        if (isWorkTimeEnabled) {
+            uint8_t start_hour = body["start"]["hour"];
+            uint8_t start_minute = body["start"]["minute"];
+            uint8_t end_hour = body["end"]["hour"];
+            uint8_t end_minute = body["end"]["minute"];
 
-        start->update(start_hour, start_minute);
-        end->update(end_hour, end_minute);
+            start->update(start_hour, start_minute);
+            end->update(end_hour, end_minute);
+        }
 
         request->send(200, "application/json", getWorkingTimeAsJson().as<String>());
     });
@@ -212,6 +216,8 @@ void apiHandler(){
 
         request->send(200, "application/json", data.as<String>());
     });
+
+
 
     /** TESTS: Тестирование оборудования */
 

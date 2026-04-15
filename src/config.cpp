@@ -49,6 +49,7 @@ bool *hasPhotoSensor = new bool(false);
 bool *hasTemperatureSensor = new bool(false);
 
 /** Time config */
+bool *isWorkTimeEnabled = new bool(false);
 WorkTime *start = new WorkTime(); // Время начала работы аппарата (09:00)
 WorkTime *end = new WorkTime(); // Время окончания работы аппарата (20:00)
 
