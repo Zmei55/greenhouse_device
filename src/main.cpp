@@ -51,7 +51,6 @@ void loop() {
     /** Работа всех датчиков по контрольному времени (повторяющийся интервал) */
     timer.interval(*controlTime, [](){
         if (*isWorkTimeEnabled) {
-            Serial.println("Установлено");
             // код выполняется, если рабочее время установлено
             /** Проверка времени, если время рабочее, то выполняется код */
             bool isWorkingHours = 
@@ -59,15 +58,12 @@ void loop() {
                 (utils.getNowTimeToInt(rtc.now()) <= utils.convertWorkTimeToInt(end->getHour(), end->getMinute()))
             ;
             if (isWorkingHours) {
-                Serial.println("Рабочее время");
                 // код выполняется, если время рабочее
                 checkSensors();
             } else {
-                Serial.println("Не рабочее время");
                 // код выполняется, если время не рабочее
             }
         }  else {
-            Serial.println("Не установлено");
             // код выполняется, если рабочее время не установлено
             checkSensors();
         }
