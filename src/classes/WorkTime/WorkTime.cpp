@@ -2,19 +2,21 @@
 
 WorkTime::WorkTime() {}
 
-WorkTime::WorkTime(uint8_t hour, uint8_t minute) {
+WorkTime::WorkTime(int8_t hour, int8_t minute) {
+    if (hour < 0 || minute < 0) throw std::runtime_error("Время не может быть отрицательным.");
     _hour = hour;
     _minute = minute;
 }
 
-WorkTime WorkTime::set(uint8_t hour, uint8_t minute) {
-    return WorkTime(_hour, _minute);
+void WorkTime::set(int8_t hour, int8_t minute) {
+    if (hour < 0 || minute < 0) throw std::runtime_error("Время не может быть отрицательным.");
+    _hour = hour;
+    _minute = minute;
 }
 
-WorkTime WorkTime::update(uint8_t newHour, uint8_t newMinute) {
-    _hour = newHour;
-    _minute = newMinute;
-    return WorkTime(_hour, _minute);
+void WorkTime::reset() {
+    _hour = -1;
+    _minute = -1;
 }
 
 uint8_t WorkTime::getHour() {
@@ -26,5 +28,5 @@ uint8_t WorkTime::getMinute() {
 }
 
 bool WorkTime::isEmpty() {
-    return (this->_hour == 0 && this->_minute == 0) ? true : false;
+    return (_hour == -1 && _minute == -1) ? true : false;
 }

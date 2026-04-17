@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdexcept>
 
 class WorkTime {
     public:
@@ -12,23 +13,17 @@ class WorkTime {
      * @param hour часы;
      * @param minute минуты;
      */
-    WorkTime(uint8_t hour, uint8_t minute);
+    WorkTime(int8_t hour, int8_t minute);
 
     /**
-     * Инициализация объекта, ранее созданного
+     * Установка данных для объекта
      * @param hour часы;
      * @param minute минуты;
-     * @return инициализированный экземпляр класса WorkTime
      */
-    WorkTime set(uint8_t hour, uint8_t minute);
+    void set(int8_t hour, int8_t minute);
 
-    /**
-     * Обновление данных ранее созданного объекта
-     * @param hour часы;
-     * @param minute минуты;
-     * @return обновленный экземпляр класса WorkTime
-     */
-    WorkTime update(uint8_t hour, uint8_t minute);
+    /** Сброс данных объекта */
+    void reset();
 
     /** Возвращает значение часов */
     uint8_t getHour();
@@ -40,6 +35,6 @@ class WorkTime {
     bool isEmpty();
 
     private:
-    uint8_t _hour;
-    uint8_t _minute;
+    int8_t _hour = -1;
+    int8_t _minute = -1;
 };
