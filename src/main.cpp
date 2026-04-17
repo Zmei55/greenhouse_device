@@ -6,6 +6,25 @@
 #include "ds3231.h"
 #include "api.h"
 
+/** Выполняется проверка всех датчиков и выполнение соответствующих инструкций */
+void checkSensors() {
+    /** Если датчик освещенности подключен, то выполняется код... */
+    if (*hasPhotoSensor) {
+        bool isDarkAndLedStripsOff = (getLightSensorValue() == true) && (*isLedStripsOn == false); // темно и освещение выключено
+        bool isLightAndLedStripsOn = (getLightSensorValue() == false) && (*isLedStripsOn == true); // светло и освещение включено
+        
+        /** Если естественного освещения не достаточно, то выполняется код... */
+        if (isDarkAndLedStripsOff) {
+            utils.enablingLighting(isLedStripsOn);
+        }
+
+        /** Если естественного освещения достаточно, то выполняется код... */
+        if (isLightAndLedStripsOn) {
+            utils.disablingLighting(isLedStripsOn);
+        }
+    }
+}
+
 void setup() {
     Serial.begin(115200);
     Wire.begin();
@@ -28,7 +47,29 @@ void setup() {
     server.begin();
 }
 
-void loop() {    
+void loop() {
+    /** Работа всех датчиков по контрольному времени (повторяющийся интервал) */
+    timer.interval(*controlTime, [](){
+        if (*isWorkTimeEnabled) {
+            Serial.println("Установлено");
+            // код выполняется, если рабочее время установлено
+            /** Проверка времени, если время рабочее, то выполняется код */
+            bool isWorkingHours = 
+                (utils.getNowTimeToInt(rtc.now()) >= utils.convertWorkTimeToInt(start->getHour(), start->getMinute())) && 
+                (utils.getNowTimeToInt(rtc.now()) <= utils.convertWorkTimeToInt(end->getHour(), end->getMinute()))
+            ;
+            if (isWorkingHours) {
+                Serial.println("Рабочее время");
+                // код выполняется, если время рабочее
+                checkSensors();
+            } else {
+                Serial.println("Не рабочее время");
+                // код выполняется, если время не рабочее
+            }
+        }  else {
+            Serial.println("Не установлено");
+            // код выполняется, если рабочее время не установлено
+            checkSensors();
+        }
+    });
 }
-
-
