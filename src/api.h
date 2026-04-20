@@ -53,6 +53,7 @@ JsonDocument getSensorsValue() {
 }
 
 void apiHandler(){
+    /** Проверка авторизации (подключился ли аппарат) */
     server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
         data["isLogged"] = true;
@@ -60,6 +61,7 @@ void apiHandler(){
         request->send(200, "application/json", data.as<String>());
     });
 
+    /** Отправка на клиент данных с включенных сенсоров и текущего времени устройства */
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
         char buf[] = "YYYY-MM-DDThh:mm:ss";
