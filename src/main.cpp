@@ -2,8 +2,8 @@
 #include <Wire.h>
 
 #include "config.h"
-#include "lightSensor.h"
-#include "ds3231.h"
+#include "./sensors/lightSensor.h"
+#include "./sensors/ds3231.h"
 #include "api.h"
 
 void checkSensors();

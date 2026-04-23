@@ -1,7 +1,7 @@
 #pragma once
 
 #include "config.h"
-#include "ds3231.h"
+#include "./sensors/ds3231.h"
 
 /**
  * Получает даты и времени устройства (датчика реального времени DS3231) в формате json

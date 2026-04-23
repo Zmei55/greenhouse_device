@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "ds3231.h"
+#include "../../sensors/ds3231.h"
 
 class MyUtils
 {
