@@ -198,25 +198,25 @@ void apiHandler(){
 
     /** Тестирование освещения (включение светодиодной ленты) */
     server.on("/tests/led-strips/on", HTTP_GET, [](AsyncWebServerRequest *request){
-        utils.enablingLighting(&isLedStripsOnRef);
+        utils.enablingLighting(isLedStripsOnRef);
         request->send(200);
     });
 
     /** Тестирование освещения (выключение светодиодной ленты) */
     server.on("/tests/led-strips/off", HTTP_GET, [](AsyncWebServerRequest *request){
-        utils.disablingLighting(&isLedStripsOnRef);
+        utils.disablingLighting(isLedStripsOnRef);
         request->send(200);
     });
 
     /** Тестирование водяного насоса (включение насоса) */
     server.on("/tests/water-pump/on", HTTP_GET, [](AsyncWebServerRequest *request){
-        utils.enablingWatering(&isWaterOnRef);
+        utils.enablingWatering(isWaterOnRef);
         request->send(200);
     });
 
     /** Тестирование водяного насоса (выключение насоса) */
     server.on("/tests/water-pump/off", HTTP_GET, [](AsyncWebServerRequest *request){
-        utils.disablingWatering(&isWaterOnRef);
+        utils.disablingWatering(isWaterOnRef);
         request->send(200);
     });
 
@@ -227,7 +227,7 @@ void apiHandler(){
     server.on("/tests/window/open", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
         JsonObject body = json.as<JsonObject>();
         runningWindowMotorTimeRef = body["runningTime"];
-        utils.openingWindow(&isWindowOpenRef);
+        utils.openingWindow(isWindowOpenRef);
 
         request->send(200);
     });
@@ -239,7 +239,7 @@ void apiHandler(){
     server.on("/tests/window/close", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
         JsonObject body = json.as<JsonObject>();
         runningWindowMotorTimeRef = body["runningTime"];
-        utils.closingWindow(&isWindowOpenRef);
+        utils.closingWindow(isWindowOpenRef);
 
         request->send(200);
     });
