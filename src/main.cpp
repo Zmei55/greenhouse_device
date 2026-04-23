@@ -6,24 +6,7 @@
 #include "ds3231.h"
 #include "api.h"
 
-/** Выполняется проверка всех датчиков и выполнение соответствующих инструкций */
-void checkSensors() {
-    /** Если датчик освещенности подключен, то выполняется код... */
-    if (*hasPhotoSensor) {
-        bool isDarkAndLedStripsOff = (getLightSensorValue() == true) && (*isLedStripsOn == false); // темно и освещение выключено
-        bool isLightAndLedStripsOn = (getLightSensorValue() == false) && (*isLedStripsOn == true); // светло и освещение включено
-        
-        /** Если естественного освещения не достаточно, то выполняется код... */
-        if (isDarkAndLedStripsOff) {
-            utils.enablingLighting(isLedStripsOn);
-        }
-
-        /** Если естественного освещения достаточно, то выполняется код... */
-        if (isLightAndLedStripsOn) {
-            utils.disablingLighting(isLedStripsOn);
-        }
-    }
-}
+void checkSensors();
 
 void setup() {
     Serial.begin(115200);
@@ -68,4 +51,23 @@ void loop() {
             checkSensors();
         }
     });
+}
+
+/** Выполняется проверка всех датчиков и выполнение соответствующих инструкций */
+void checkSensors() {
+    /** Если датчик освещенности подключен, то выполняется код... */
+    if (*hasPhotoSensor) {
+        bool isDarkAndLedStripsOff = (getLightSensorValue() == true) && (*isLedStripsOn == false); // темно и освещение выключено
+        bool isLightAndLedStripsOn = (getLightSensorValue() == false) && (*isLedStripsOn == true); // светло и освещение включено
+        
+        /** Если естественного освещения не достаточно, то выполняется код... */
+        if (isDarkAndLedStripsOff) {
+            utils.enablingLighting(isLedStripsOn);
+        }
+
+        /** Если естественного освещения достаточно, то выполняется код... */
+        if (isLightAndLedStripsOn) {
+            utils.disablingLighting(isLedStripsOn);
+        }
+    }
 }
