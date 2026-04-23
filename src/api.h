@@ -3,54 +3,8 @@
 #include "config.h"
 #include "./sensors/ds3231.h"
 
-/**
- * Получает даты и времени устройства (датчика реального времени DS3231) в формате json
- * @return дату и время устройства (JsonDocument)
- */
-JsonDocument getCurrentTimeAsJson() {
-    JsonDocument data;
-    char buf[] = "YYYY-MM-DDThh:mm:ss";
-    data["deviceDateTime"] = rtc.now().toString(buf);
-    return data;
-}
-
-/**
- * Получает рабочее время устройства в формате json
- * @return рабочее время устройства (JsonDocument)
- */
-JsonDocument getWorkingTimeAsJson() {
-    JsonDocument data;
-    data["isEnabled"] = isWorkTimeEnabledRef;
-    data["start"] = nullptr;
-    data["end"] = nullptr;
-
-    if (!WTStartRef.isEmpty()) {
-        JsonObject startTime = data["start"].to<JsonObject>();
-        startTime["hour"] = WTStartRef.getHour();
-        startTime["minute"] = WTStartRef.getMinute();
-    }
-
-    if (!WTEndRef.isEmpty()) {
-        JsonObject endTime = data["end"].to<JsonObject>();
-        endTime["hour"] = WTEndRef.getHour();
-        endTime["minute"] = WTEndRef.getMinute();
-    }
-
-    return data;
-}
-
-/** 
- * Получение состояния сенсоров
- * true - включен
- * false - выключен
- */
-JsonDocument getSensorsValue() {
-    JsonDocument data;
-    data["soilMoisture"] = hasSoilMoistureSensorRef;
-    data["photo"] = hasPhotoSensorRef;
-    data["temperature"] = hasTemperatureSensorRef;
-    return data;
-}
+JsonDocument getCurrentTimeAsJson();
+JsonDocument getSettingsValueAsJson();
 
 void apiHandler(){
     /** Проверка авторизации (подключился ли аппарат) */
@@ -111,21 +65,7 @@ void apiHandler(){
 
     /** Отправка на клиент настроек */
     server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
-        JsonDocument data;
-
-        /** Какие сенсоры включены, а какие выключены */
-        data["sensors"] = getSensorsValue();
-
-        /** Получение значения температуры, для управления ч-либо */
-        data["controlTemperature"] = controlTemperatureRef;
-
-        /** Получение значения интервала проверки сенсоров в секундах */
-        data["controlTime"] = controlTimeRef / 1000;
-
-        /** Рабочее время аппарата */
-        data["workingHours"] = getWorkingTimeAsJson();
-
-        request->send(200, "application/json", data.as<String>());
+        request->send(200, "application/json", getSettingsValueAsJson().as<String>());
     });
 
     /**
@@ -135,7 +75,6 @@ void apiHandler(){
      * @return новый объект настроек
      */
     server.on("/settings", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
-        JsonDocument data;
         JsonDocument error;
 
         JsonObject body = json.as<JsonObject>();
@@ -173,20 +112,8 @@ void apiHandler(){
             WTEndRef.reset();
         }
 
-        /** Какие сенсоры включены, а какие выключены */
-        data["sensors"] = getSensorsValue();
-
-        /** Получение значения температуры, для управления ч-либо */
-        data["controlTemperature"] = controlTemperatureRef;
-
-        /** Получение значения интервала проверки сенсоров */
-        data["controlTime"] = controlTimeRef / 1000;
-
-        /** Рабочее время аппарата */
-        data["workingHours"] = getWorkingTimeAsJson();
-
         if (error.isNull()) {
-            request->send(200, "application/json", data.as<String>());
+            request->send(200, "application/json", getSettingsValueAsJson().as<String>());
         } else {
             request->send(400, "application/json", error.as<String>());
         }
@@ -243,4 +170,63 @@ void apiHandler(){
 
         request->send(200);
     });
+}
+
+/**
+ * Получает даты и времени устройства (датчика реального времени DS3231) в формате json
+ * @return дату и время устройства (JsonDocument)
+ */
+JsonDocument getCurrentTimeAsJson() {
+    JsonDocument data;
+    char buf[] = "YYYY-MM-DDThh:mm:ss";
+    data["deviceDateTime"] = rtc.now().toString(buf);
+    return data;
+}
+
+/**
+ * Получает рабочее время устройства в формате json
+ * @return рабочее время устройства (JsonDocument)
+ */
+JsonDocument getWorkingTimeAsJson() {
+    JsonDocument data;
+    data["isEnabled"] = isWorkTimeEnabledRef;
+    data["start"] = nullptr;
+    data["end"] = nullptr;
+
+    if (!WTStartRef.isEmpty()) {
+        JsonObject startTime = data["start"].to<JsonObject>();
+        startTime["hour"] = WTStartRef.getHour();
+        startTime["minute"] = WTStartRef.getMinute();
+    }
+
+    if (!WTEndRef.isEmpty()) {
+        JsonObject endTime = data["end"].to<JsonObject>();
+        endTime["hour"] = WTEndRef.getHour();
+        endTime["minute"] = WTEndRef.getMinute();
+    }
+
+    return data;
+}
+
+/** 
+ * Получение состояния сенсоров
+ * true - включен
+ * false - выключен
+ */
+JsonDocument getSensorsValue() {
+    JsonDocument data;
+    data["soilMoisture"] = hasSoilMoistureSensorRef;
+    data["photo"] = hasPhotoSensorRef;
+    data["temperature"] = hasTemperatureSensorRef;
+    return data;
+}
+
+/** Получение состояния настроек */
+JsonDocument getSettingsValueAsJson() {
+    JsonDocument data;
+    data["sensors"] = getSensorsValue(); // Какие сенсоры включены, а какие выключены
+    data["controlTemperature"] = controlTemperatureRef; // Получение значения температуры, для управления ч-либо
+    data["controlTime"] = controlTimeRef / 1000; // Получение значения интервала проверки сенсоров в секундах
+    data["workingHours"] = getWorkingTimeAsJson(); // Рабочее время аппарата
+    return data;
 }
