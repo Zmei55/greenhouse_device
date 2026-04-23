@@ -59,12 +59,12 @@ void checkSensors() {
         
         /** Если естественного освещения не достаточно, то выполняется код... */
         if (isDarkAndLedStripsOff) {
-            utils.enablingLighting(&isLedStripsOnRef);
+            utils.enablingLighting(isLedStripsOnRef);
         }
 
         /** Если естественного освещения достаточно, то выполняется код... */
         if (isLightAndLedStripsOn) {
-            utils.disablingLighting(&isLedStripsOnRef);
+            utils.disablingLighting(isLedStripsOnRef);
         }
     }
 }
