@@ -32,14 +32,11 @@ void setup() {
 
 void loop() {
     /** Работа всех датчиков по контрольному времени (повторяющийся интервал) */
-    timer.interval(*controlTime, [](){
-        if (*isWorkTimeEnabled) {
+    timer.interval(controlTimeRef, [](){
+        if (isWorkTimeEnabledRef) {
             // код выполняется, если рабочее время установлено
             /** Проверка времени, если время рабочее, то выполняется код */
-            bool isWorkingHours = 
-                (utils.getNowTimeToInt(rtc.now()) >= utils.convertWorkTimeToInt(start->getHour(), start->getMinute())) && 
-                (utils.getNowTimeToInt(rtc.now()) <= utils.convertWorkTimeToInt(end->getHour(), end->getMinute()))
-            ;
+            bool isWorkingHours = (utils.getNowTimeToInt(rtc.now()) >= WTStartRef.getWorkTimeAsInt()) && (utils.getNowTimeToInt(rtc.now()) <= WTEndRef.getWorkTimeAsInt());
             if (isWorkingHours) {
                 // код выполняется, если время рабочее
                 checkSensors();
@@ -56,18 +53,18 @@ void loop() {
 /** Выполняется проверка всех датчиков и выполнение соответствующих инструкций */
 void checkSensors() {
     /** Если датчик освещенности подключен, то выполняется код... */
-    if (*hasPhotoSensor) {
-        bool isDarkAndLedStripsOff = (getLightSensorValue() == true) && (*isLedStripsOn == false); // темно и освещение выключено
-        bool isLightAndLedStripsOn = (getLightSensorValue() == false) && (*isLedStripsOn == true); // светло и освещение включено
+    if (hasPhotoSensorRef) {
+        bool isDarkAndLedStripsOff = (getLightSensorValue() == true) && (isLedStripsOnRef == false); // темно и освещение выключено
+        bool isLightAndLedStripsOn = (getLightSensorValue() == false) && (isLedStripsOnRef == true); // светло и освещение включено
         
         /** Если естественного освещения не достаточно, то выполняется код... */
         if (isDarkAndLedStripsOff) {
-            utils.enablingLighting(isLedStripsOn);
+            utils.enablingLighting(&isLedStripsOnRef);
         }
 
         /** Если естественного освещения достаточно, то выполняется код... */
         if (isLightAndLedStripsOn) {
-            utils.disablingLighting(isLedStripsOn);
+            utils.disablingLighting(&isLedStripsOnRef);
         }
     }
 }

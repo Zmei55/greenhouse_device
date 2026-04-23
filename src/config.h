@@ -36,15 +36,15 @@ extern uint8_t THERMOMETER_PIN;
 extern uint8_t LIGHT_SENSOR_PIN;
 
 /** General settings */
-extern uint32_t *controlTime; // Интервал проверки показаний датчиков (в миллисекундах), при котором выполняется управление чем-либо (открытие окна, включение полива, включение освещения и т.д.)
-extern float *controlTemperature; // Температура, при которой открывается окно (если датчик температуры подключен и используется в работе)
-extern uint16_t soilMoistureDryValue; // Значение датчика влажности почвы, при котором включается полив
-extern uint16_t soilMoistureWetValue; // Значение датчика влажности почвы, при котором выключается полив
-extern uint32_t *runningWindowMotorTime; // Время, в течение которого мотор открывает/закрывает окно (в секундах)
-extern bool *isLedStripsOn; // Включено ли освещение (по ум: false)
-extern bool *isWaterOn; // Включен ли полив (по ум: false)
-extern bool *isMotorOn; // Включен ли полив (по ум: false)
-extern bool *isWindowOpen; // Открыто ли окно (по ум: false)
+extern uint32_t &controlTimeRef; // Интервал проверки показаний датчиков (в миллисекундах), при котором выполняется управление чем-либо (открытие окна, включение полива, включение освещения и т.д.)
+extern float &controlTemperatureRef; // Температура, при которой открывается окно (если датчик температуры подключен и используется в работе)
+extern uint16_t &soilMoistureDryValueRef; // Значение датчика влажности почвы, при котором включается полив
+extern uint16_t &soilMoistureWetValueRef; // Значение датчика влажности почвы, при котором выключается полив
+extern uint32_t &runningWindowMotorTimeRef; // Время, в течение которого мотор открывает/закрывает окно (в секундах)
+extern bool &isLedStripsOnRef; // Включено ли освещение (по ум: false)
+extern bool &isWaterOnRef; // Включен ли полив (по ум: false)
+extern bool &isMotorOnRef; // Включен ли полив (по ум: false)
+extern bool &isWindowOpenRef; // Открыто ли окно (по ум: false)
 
 /** WiFi config */
 extern char SSID[21];
@@ -56,11 +56,11 @@ extern char PASSWORD[21];
  * При отключении датчика, связанный с ним код не выполняется, даже если сейчас рабочее время
  * По умолчанию все датчики отключены и не используются в работе, для исключения ошибок при повторном включении аппарата
  */
-extern bool *hasSoilMoistureSensor; // Датчик влажности почвы
-extern bool *hasPhotoSensor; // Датчик освещённости
-extern bool *hasTemperatureSensor;  // Датчик температуры
+extern bool &hasSoilMoistureSensorRef; // Датчик влажности почвы
+extern bool &hasPhotoSensorRef; // Датчик освещённости
+extern bool &hasTemperatureSensorRef;  // Датчик температуры
 
 /** Time config */
-extern bool *isWorkTimeEnabled; // Включено ли рабочее время
-extern WorkTime *start; // Время начала работы аппарата
-extern WorkTime *end; // Время окончания работы аппарата
+extern bool &isWorkTimeEnabledRef; // Включено ли рабочее время
+extern WorkTime &WTStartRef; // Время начала работы аппарата
+extern WorkTime &WTEndRef; // Время окончания работы аппарата

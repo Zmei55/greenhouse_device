@@ -43,11 +43,4 @@ public:
      * @param flag включен ли мотор (bool)
      */
     void closingWindow(bool *flag);
-
-    /** Приведение времени в целое число
-     * @param hour час
-     * @param minute минута
-     * @return целое число
-     */
-    uint32_t convertWorkTimeToInt(int8_t hour, int8_t minute);
 };

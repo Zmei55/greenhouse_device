@@ -22,6 +22,12 @@ class WorkTime {
      */
     void set(int8_t hour, int8_t minute);
 
+    /**
+     * Приведение времени в целое число
+     * @return целое число от 00:00:00
+     */
+    uint32_t getWorkTimeAsInt();
+
     /** Сброс данных объекта */
     void reset();
 

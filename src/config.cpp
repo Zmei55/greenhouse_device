@@ -29,26 +29,44 @@ GyverDS18Single term(THERMOMETER_PIN);
 // #endif
 
 /** General settings */
-uint32_t *controlTime = new uint32_t(TimeApp::ONE_SECOND);
-float *controlTemperature = new float(24.0);
+uint32_t controlTime = TimeApp::ONE_SECOND;
+float controlTemperature = 24.0;
 uint16_t soilMoistureDryValue = 3750;
 uint16_t soilMoistureWetValue = 3600;
-uint32_t *runningWindowMotorTime = new uint32_t(5);
-bool *isLedStripsOn = new bool(false);
-bool *isWaterOn = new bool(false);
-bool *isMotorOn = new bool(false);
-bool *isWindowOpen = new bool(false);
+uint32_t runningWindowMotorTime = 5;
+bool isLedStripsOn = false;
+bool isWaterOn = false;
+bool isMotorOn = false;
+bool isWindowOpen = false;
+
+uint32_t &controlTimeRef = controlTime;
+float &controlTemperatureRef = controlTemperature;
+uint16_t &soilMoistureDryValueRef = soilMoistureDryValue;
+uint16_t &soilMoistureWetValueRef = soilMoistureWetValue;
+uint32_t &runningWindowMotorTimeRef = runningWindowMotorTime;
+bool &isLedStripsOnRef = isLedStripsOn;
+bool &isWaterOnRef = isWaterOn;
+bool &isMotorOnRef = isMotorOn;
+bool &isWindowOpenRef = isWindowOpen;
 
 /** WiFi config */
 char SSID[21] = "greenhouse";
 char PASSWORD[21] = "";
 
 /** Sensors */
-bool *hasSoilMoistureSensor = new bool(false);
-bool *hasPhotoSensor = new bool(false);
-bool *hasTemperatureSensor = new bool(false);
+bool hasSoilMoistureSensor = false;
+bool hasPhotoSensor = false;
+bool hasTemperatureSensor = false;
+
+bool &hasSoilMoistureSensorRef = hasSoilMoistureSensor;
+bool &hasPhotoSensorRef = hasPhotoSensor;
+bool &hasTemperatureSensorRef = hasTemperatureSensor;
 
 /** Time config */
-bool *isWorkTimeEnabled = new bool(false);
-WorkTime *start = new WorkTime(); // Время начала работы аппарата (09:00)
-WorkTime *end = new WorkTime(); // Время окончания работы аппарата (20:00)
+bool isWorkTimeEnabled = false;
+WorkTime start = WorkTime(); // Время начала работы аппарата (09:00)
+WorkTime end = WorkTime(); // Время окончания работы аппарата (20:00)
+
+bool &isWorkTimeEnabledRef = isWorkTimeEnabled;
+WorkTime &WTStartRef = start;
+WorkTime &WTEndRef = end;

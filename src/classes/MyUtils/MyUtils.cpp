@@ -37,7 +37,3 @@ void MyUtils::disablingWatering(bool *flag) {
 void MyUtils::openingWindow(bool *flag) {};
 
 void MyUtils::closingWindow(bool *flag) {};
-
-uint32_t MyUtils::convertWorkTimeToInt(int8_t hour, int8_t minute) {
-    return hour * 3600 + minute * 60;
-}
