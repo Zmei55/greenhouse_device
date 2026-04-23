@@ -29,7 +29,7 @@ GyverDS18Single term(THERMOMETER_PIN);
 // #endif
 
 /** General settings */
-uint32_t *controlTime = new uint32_t(TimeApp::ONE_SECOND * 10);
+uint32_t *controlTime = new uint32_t(TimeApp::ONE_SECOND);
 float *controlTemperature = new float(24.0);
 uint16_t soilMoistureDryValue = 3750;
 uint16_t soilMoistureWetValue = 3600;
@@ -52,6 +52,3 @@ bool *hasTemperatureSensor = new bool(false);
 bool *isWorkTimeEnabled = new bool(false);
 WorkTime *start = new WorkTime(); // Время начала работы аппарата (09:00)
 WorkTime *end = new WorkTime(); // Время окончания работы аппарата (20:00)
-
-uint32_t startTimeToInt = start->getHour() * 3600 + start->getMinute() * 60; // Время включения аппарата (09:00)
-uint32_t endTimeToInt = end->getHour() * 3600 + end->getMinute() * 60; // Время выключения аппарата (20:00)

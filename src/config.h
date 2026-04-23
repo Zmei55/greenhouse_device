@@ -64,5 +64,3 @@ extern bool *hasTemperatureSensor;  // Датчик температуры
 extern bool *isWorkTimeEnabled; // Включено ли рабочее время
 extern WorkTime *start; // Время начала работы аппарата
 extern WorkTime *end; // Время окончания работы аппарата
-extern uint32_t startTimeToInt; // Время начала работы аппарата в виде целого числа (секунды с 00:00:00)
-extern uint32_t endTimeToInt; // Время окончания работы аппарата в виде целого числа (секунды с 00:00:00)

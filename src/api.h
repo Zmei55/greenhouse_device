@@ -24,12 +24,14 @@ JsonDocument getWorkingTimeAsJson() {
     data["start"] = nullptr;
     data["end"] = nullptr;
 
-    if (*isWorkTimeEnabled) {
+    if (!start->isEmpty()) {
         JsonObject startTime = data["start"].to<JsonObject>();
         startTime["hour"] = start->getHour();
         startTime["minute"] = start->getMinute();
+    }
 
-        JsonObject endTime = data["end"].to<JsonObject>();        
+    if (!end->isEmpty()) {
+        JsonObject endTime = data["end"].to<JsonObject>();
         endTime["hour"] = end->getHour();
         endTime["minute"] = end->getMinute();
     }
@@ -51,6 +53,7 @@ JsonDocument getSensorsValue() {
 }
 
 void apiHandler(){
+    /** Проверка авторизации (подключился ли аппарат) */
     server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
         data["isLogged"] = true;
@@ -58,6 +61,7 @@ void apiHandler(){
         request->send(200, "application/json", data.as<String>());
     });
 
+    /** Отправка на клиент данных с включенных сенсоров и текущего времени устройства */
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
         char buf[] = "YYYY-MM-DDThh:mm:ss";
@@ -105,54 +109,6 @@ void apiHandler(){
         request->send(200, "application/json", getCurrentTimeAsJson().as<String>());
     });
 
-    /** Отправка на клиент рабочего времени устройства */
-    server.on("/working-time", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(200, "application/json", getWorkingTimeAsJson().as<String>());
-    });
-
-    /**
-     * Получение с клиента новой даты и времени
-     * Установка новой даты и времени
-     * @param json объект с временем начала и окончания рабочего времени
-     * @return новый объект
-     */
-    server.on("/working-time", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){        
-        JsonObject body = json.as<JsonObject>();
-        *isWorkTimeEnabled = body["isEnabled"];
-        
-        if (isWorkTimeEnabled) {
-            uint8_t start_hour = body["start"]["hour"];
-            uint8_t start_minute = body["start"]["minute"];
-            uint8_t end_hour = body["end"]["hour"];
-            uint8_t end_minute = body["end"]["minute"];
-
-            start->update(start_hour, start_minute);
-            end->update(end_hour, end_minute);
-        }
-
-        request->send(200, "application/json", getWorkingTimeAsJson().as<String>());
-    });
-
-    /** Отправка на клиент состояния сенсоров */
-    server.on("/sensors", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(200, "application/json", getSensorsValue().as<String>());
-    });
-
-    /**
-     * Получение с клиента новых значений для сенсоров
-     * Установка новых значений
-     * @param json объект с булевыми значениями
-     * @return новый объект
-     */
-    server.on("/sensors", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
-        JsonObject body = json.as<JsonObject>();
-        *hasSoilMoistureSensor = body["soilMoisture"];
-        *hasPhotoSensor = body["photo"];
-        *hasTemperatureSensor = body["temperature"];
-
-        request->send(200, "application/json", getSensorsValue().as<String>());
-    });
-
     /** Отправка на клиент настроек */
     server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
         JsonDocument data;
@@ -167,10 +123,7 @@ void apiHandler(){
         data["controlTime"] = *controlTime;
 
         /** Рабочее время аппарата */
-        data["workingHours"] = nullptr;
-        if (!start->isEmpty() && !end->isEmpty()) {
-            data["workingHours"] = getWorkingTimeAsJson();
-        }
+        data["workingHours"] = getWorkingTimeAsJson();
 
         request->send(200, "application/json", data.as<String>());
     });
@@ -183,27 +136,41 @@ void apiHandler(){
      */
     server.on("/settings", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
         JsonDocument data;
+        JsonDocument error;
 
         JsonObject body = json.as<JsonObject>();
+
         /** Включение / выключение сенсоров */
-        *hasSoilMoistureSensor = body["soilMoisture"];
-        *hasPhotoSensor = body["photo"];
-        *hasTemperatureSensor = body["temperature"];
+        JsonObject sensors = body["sensors"];
+        *hasSoilMoistureSensor = sensors["soilMoisture"];
+        *hasPhotoSensor = sensors["photo"];
+        *hasTemperatureSensor = sensors["temperature"];
         /** Установка значение контрольной температуры */
         *controlTemperature = body["controlTemperature"];
         /** Установка значение контрольного времени (интервала проверки показаний датчиков) */
         *controlTime = body["controlTime"];
 
         /** Установка рабочего времени */
-        bool workingHours = body["workingHours"];
-        if (!workingHours) {
-            uint8_t start_hour = body["workingHours"]["start"]["hour"];
-            uint8_t start_minute = body["workingHours"]["start"]["minute"];
-            uint8_t end_hour = body["workingHours"]["end"]["hour"];
-            uint8_t end_minute = body["workingHours"]["end"]["minute"];
+        JsonObject workingHours = body["workingHours"];
+        bool isEnabled = workingHours["isEnabled"];
+        
+        if (isEnabled) {
+            int8_t start_hour = workingHours["start"]["hour"];
+            int8_t start_minute = workingHours["start"]["minute"];
+            int8_t end_hour = workingHours["end"]["hour"];
+            int8_t end_minute = workingHours["end"]["minute"];
 
-            start->update(start_hour, start_minute);
-            end->update(end_hour, end_minute);
+            try {
+                start->set(start_hour, start_minute);
+                end->set(end_hour, end_minute);
+                *isWorkTimeEnabled = isEnabled;
+            } catch(const std::exception& e) {
+                error["message"] = e.what();
+            }
+        } else {
+            *isWorkTimeEnabled = false;
+            start->reset();
+            end->reset();
         }
 
         /** Какие сенсоры включены, а какие выключены */
@@ -216,12 +183,13 @@ void apiHandler(){
         data["controlTime"] = *controlTime;
 
         /** Рабочее время аппарата */
-        data["workingHours"] = nullptr;
-        if (!start->isEmpty() && !end->isEmpty()) {
-            data["workingHours"] = getWorkingTimeAsJson();
-        }
+        data["workingHours"] = getWorkingTimeAsJson();
 
-        request->send(200, "application/json", data.as<String>());
+        if (error.isNull()) {
+            request->send(200, "application/json", data.as<String>());
+        } else {
+            request->send(400, "application/json", error.as<String>());
+        }
     });
 
 
