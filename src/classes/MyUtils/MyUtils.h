@@ -4,8 +4,7 @@
 
 #include "../../sensors/ds3231.h"
 
-class MyUtils
-{
+class MyUtils {
 public:
     MyUtils();
 
@@ -33,14 +32,4 @@ public:
      * @param flag включен ли полив (bool)
      */
     void disablingWatering(bool &flag);
-
-    /** Открывание окна
-     * @param flag включен ли мотор (bool)
-     */
-    void openingWindow(bool &flag);
-
-    /** Закрывание окна
-     * @param flag включен ли мотор (bool)
-     */
-    void closingWindow(bool &flag);
 };

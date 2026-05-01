@@ -33,7 +33,3 @@ void MyUtils::disablingWatering(bool &flag) {
     // digitalWrite(WATER_PIN, LOW);
     flag = false;
 }
-
-void MyUtils::openingWindow(bool &flag) {};
-
-void MyUtils::closingWindow(bool &flag) {};
