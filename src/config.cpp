@@ -4,17 +4,18 @@
     AsyncWebServer server(80);
 #endif
 
+/** Объявление классов */
 MyTimer timer;
 MyUtils utils;
-GyverDS18Single term(THERMOMETER_PIN);
+Window window(MOTOR_IN_1_PIN, MOTOR_IN_2_PIN);
 
 /** Pins */
 
 /** Настройка пинов для ESP32_C3 */
 #if defined(ESP32)
-    // uint8_t MOTOR_IN_1_PIN = 0;
-    // uint8_t MOTOR_IN_2_PIN = 20;
-    // uint8_t WATER_IN_3_PIN = 1;
+    int8_t MOTOR_IN_1_PIN = 0;
+    int8_t MOTOR_IN_2_PIN = 1;
+    // uint8_t WATER_IN_3_PIN = 20;
     // uint8_t WATER_IN_4_PIN = 10;
     uint8_t LED_STRIP_ONE_PIN = 5;
     uint8_t LED_STRIP_TWO_PIN = 6;
@@ -29,25 +30,19 @@ GyverDS18Single term(THERMOMETER_PIN);
 // #endif
 
 /** General settings */
-uint32_t controlTime = TimeApp::ONE_SECOND;
+uint32_t controlTime = 1000; // Интервал проверки показаний датчиков (в миллисекундах), при котором выполняется управление чем-либо (открытие окна, включение полива, включение освещения и т.д.)
 float controlTemperature = 24.0;
 uint16_t soilMoistureDryValue = 3750;
 uint16_t soilMoistureWetValue = 3600;
-uint32_t runningWindowMotorTime = 5;
 bool isLedStripsOn = false;
 bool isWaterOn = false;
-bool isMotorOn = false;
-bool isWindowOpen = false;
 
 uint32_t &controlTimeRef = controlTime;
 float &controlTemperatureRef = controlTemperature;
 uint16_t &soilMoistureDryValueRef = soilMoistureDryValue;
 uint16_t &soilMoistureWetValueRef = soilMoistureWetValue;
-uint32_t &runningWindowMotorTimeRef = runningWindowMotorTime;
 bool &isLedStripsOnRef = isLedStripsOn;
 bool &isWaterOnRef = isWaterOn;
-bool &isMotorOnRef = isMotorOn;
-bool &isWindowOpenRef = isWindowOpen;
 
 /** WiFi config */
 char SSID[21] = "greenhouse";
