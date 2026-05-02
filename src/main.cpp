@@ -3,10 +3,11 @@
 
 #include "config.h"
 #include "./sensors/lightSensor.h"
-#include "./sensors/ds3231.h"
+#include "./sensors/thermometer.h"
 #include "api.h"
 
 void checkSensors();
+void stopingWindowMotor(uint32_t startMotor, uint32_t delay);
 
 void setup() {
     Serial.begin(115200);
@@ -22,6 +23,9 @@ void setup() {
     pinMode(LED_STRIP_TWO_PIN, OUTPUT);
     pinMode(LED_STRIP_THREE_PIN, OUTPUT);
     pinMode(SOIL_MOISTURE_PIN, INPUT);
+    pinMode(THERMOMETER_PIN, INPUT);
+    pinMode(window.getMotorPinOne(), OUTPUT);
+    pinMode(window.getMotorPinTwo(), OUTPUT);
     
     term.setResolution(12); // Установка разрешения датчика температуры (9-12 бит, чем выше, тем точнее, но дольше измерение)
     term.requestTemp(); // Запрос на измерение температуры (необходимо для получения данных при первом вызове term.tick())
@@ -48,6 +52,9 @@ void loop() {
             checkSensors();
         }
     });
+
+    /** Если мотор, открывающий/закрывающий окно, включен, то выполняется код... */
+    if (window.getIsMotorOn()) stopingWindowMotor(window.getMotorStartTime(), window.getRunningMotorTime());
 }
 
 /** Выполняется проверка всех датчиков и выполнение соответствующих инструкций */
@@ -66,5 +73,33 @@ void checkSensors() {
         if (isLightAndLedStripsOn) {
             utils.disablingLighting(isLedStripsOnRef);
         }
+    }
+
+    /** Если датчик температуры подключен, запрос данных с датчика, ожидание данных, данные с датчика получены, то выполняется код... */
+    if (hasTemperatureSensorRef && term.requestTemp() && term.waitReady() && term.readTemp()) {
+        bool isTemperatureHigh = term.getTemp() > controlTemperatureRef; // Текущая температура выше контрольной
+
+        /** Если температура выше контрольной, мотор выключен, окно закрыто, то открывает окно */
+        if (isTemperatureHigh && !window.getIsMotorOn() && !window.getIsWindowOpen()) {
+            window.open();
+        }
+
+        /** Если температура ниже контрольной, мотор выключен, окно открыто, то закрывает окно */
+        if (!isTemperatureHigh && !window.getIsMotorOn() && window.getIsWindowOpen()) {
+            window.close();
+        }
+    }
+}
+
+/**
+ * Выполняется остановка мотора, открывающего/закрывающего окно
+ * @param startMotor начало работы мотора
+ * @param delay время, через которое мотор должен остановиться
+ */
+void stopingWindowMotor(uint32_t startMotor, uint32_t delay) {
+    if (millis() - startMotor >= delay) {
+        window.stopMotor();
+        window.toggleWindowState();
+        window.resetMotorStartTime();
     }
 }
