@@ -2,9 +2,11 @@
 
 #include "config.h"
 #include "./sensors/ds3231.h"
+#include "./sensors/thermometer.h"
 
 JsonDocument getCurrentTimeAsJson();
 JsonDocument getSettingsValueAsJson();
+void saveRuntimeToWindow(uint8_t body);
 
 void apiHandler(){
     /** Проверка авторизации (подключился ли аппарат) */
@@ -45,8 +47,8 @@ void apiHandler(){
     });
 
     /**
-     * Получение с клиента новой даты и времени
-     * Установка новой даты и времени
+     * Установка новой даты и времени,
+     * полученной от клиента
      * @param json массив с датой (2026, 1, 1, 12, 0, 0) -> 01.01.2026 12:00:00
      * @return новую дату и время
      */
@@ -76,7 +78,6 @@ void apiHandler(){
      */
     server.on("/settings", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
         JsonDocument error;
-
         JsonObject body = json.as<JsonObject>();
 
         /** Включение / выключение сенсоров */
@@ -88,6 +89,8 @@ void apiHandler(){
         controlTemperatureRef = body["controlTemperature"];
         /** Установка значение контрольного времени (интервала проверки показаний датчиков) в миллисекундах */
         controlTimeRef = (int)body["controlTime"] * 1000;
+        /** Установка значение времени работы мотора окна в миллисекундах */
+        saveRuntimeToWindow(body["runningTime"]);
 
         /** Установка рабочего времени */
         JsonObject workingHours = body["workingHours"];
@@ -152,11 +155,17 @@ void apiHandler(){
      * @param json объект с указанием времени, в течении которого мотор открывает окно (в секундах)
      */
     server.on("/tests/window/open", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
+        JsonDocument error;
         JsonObject body = json.as<JsonObject>();
-        runningWindowMotorTimeRef = body["runningTime"];
-        utils.openingWindow(isWindowOpenRef);
 
-        request->send(200);
+        try {
+            saveRuntimeToWindow(body["runningTime"]);
+            window.open();
+            request->send(200);
+        } catch(const std::exception& e) {
+            error["message"] = e.what();
+            request->send(400, "application/json", error.as<String>());
+        }
     });
 
     /**
@@ -164,11 +173,17 @@ void apiHandler(){
      * @param json объект с новыми настройками
      */
     server.on("/tests/window/close", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json){
+        JsonDocument error;
         JsonObject body = json.as<JsonObject>();
-        runningWindowMotorTimeRef = body["runningTime"];
-        utils.closingWindow(isWindowOpenRef);
 
-        request->send(200);
+        try {
+            saveRuntimeToWindow(body["runningTime"]);
+            window.close();
+            request->send(200);
+        } catch(const std::exception& e) {
+            error["message"] = e.what();
+            request->send(400, "application/json", error.as<String>());
+        }
     });
 }
 
@@ -212,6 +227,7 @@ JsonDocument getWorkingTimeAsJson() {
  * Получение состояния сенсоров
  * true - включен
  * false - выключен
+ * @return значения состояния сенсоров (JsonDocument)
  */
 JsonDocument getSensorsValue() {
     JsonDocument data;
@@ -221,12 +237,38 @@ JsonDocument getSensorsValue() {
     return data;
 }
 
-/** Получение состояния настроек */
+/**
+ * Получение состояния настроек
+ * @return значения настроек (JsonDocument)
+ */
 JsonDocument getSettingsValueAsJson() {
     JsonDocument data;
     data["sensors"] = getSensorsValue(); // Какие сенсоры включены, а какие выключены
     data["controlTemperature"] = controlTemperatureRef; // Получение значения температуры, для управления ч-либо
     data["controlTime"] = controlTimeRef / 1000; // Получение значения интервала проверки сенсоров в секундах
+    data["runningTime"] = window.getRunningMotorTime() / 1000; // Получения значения времени, в течении которого работает мотор окна (в секундах)
     data["workingHours"] = getWorkingTimeAsJson(); // Рабочее время аппарата
     return data;
+}
+
+/**
+ * Получить время работы открывания окна из json
+ * @param body время, в течении которого надо открывать окно (в секундах)
+ * @return время, в течении которого надо открывать окно (в миллисекундах)
+ */
+uint32_t getRuntimeFromJson(uint8_t body) {
+    uint32_t runningTime = body;
+    if (runningTime <= 0) throw std::runtime_error("Время открывания/закрывания окна не может быть равно или меньше нуля.");
+
+    runningTime *= 1000; // переводит секунды в миллисекунды
+    return runningTime;
+}
+
+/**
+ * Сохранить время работы открывания окна в объекте Window
+ * @param body время, в течении которого надо открывать окно (в секундах)
+ */
+void saveRuntimeToWindow(uint8_t body) {
+    uint32_t runningTime = getRuntimeFromJson(body);
+    window.setRunningMotorTime(runningTime);
 }
