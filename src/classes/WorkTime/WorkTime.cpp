@@ -14,6 +14,10 @@ void WorkTime::set(int8_t hour, int8_t minute) {
     _minute = minute;
 }
 
+uint32_t WorkTime::getWorkTimeAsInt() {
+    return this->getHour() * 3600 + this->getMinute() * 60;
+}
+
 void WorkTime::reset() {
     _hour = -1;
     _minute = -1;
