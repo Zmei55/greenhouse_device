@@ -1,11 +1,15 @@
+/**
+ * Класс, отвечающий за хранение и обработку рабочего времени
+ * (времени, в течении которого устройство должно работать)
+ */
 #pragma once
 
-#include <stdint.h>
 #include <stdexcept>
+#include <stdint.h>
 
 class WorkTime {
-    public:
-    /** Создание НЕ инициализированный объект */
+  public:
+    /** Создание НЕ инициализированного объект */
     WorkTime();
 
     /**
@@ -40,7 +44,7 @@ class WorkTime {
     /** Возвращает значение пустой объект или нет */
     bool isEmpty();
 
-    private:
+  private:
     int8_t _hour = -1;
     int8_t _minute = -1;
 };
