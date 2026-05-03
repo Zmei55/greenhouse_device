@@ -1,13 +1,14 @@
 #pragma once
 
-#include <stdint.h>
-#include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
+#include <ESPAsyncWebServer.h>
 #include <MyTimer.h>
+#include <stdint.h>
 
+#include "classes/Lighting/Lighting.h"
 #include "classes/MyUtils/MyUtils.h"
-#include "classes/WorkTime/WorkTime.h"
 #include "classes/Window/Window.h"
+#include "classes/WorkTime/WorkTime.h"
 
 #if defined(ESP32)
 #include <AsyncTCP.h>
@@ -21,6 +22,7 @@ extern MyTimer timer;
 extern MyUtils utils;
 extern AsyncWebServer server;
 extern Window window;
+extern Lighting lighting;
 
 /** Pins */
 extern int8_t MOTOR_IN_1_PIN;
@@ -35,11 +37,15 @@ extern uint8_t THERMOMETER_PIN;
 extern uint8_t LIGHT_SENSOR_PIN;
 
 /** General settings */
-extern uint32_t &controlTimeRef; // Интервал проверки показаний датчиков (в миллисекундах), при котором выполняется управление чем-либо (открытие окна, включение полива, включение освещения и т.д.)
-extern float &controlTemperatureRef; // Температура, при которой открывается окно (если датчик температуры подключен и используется в работе)
-extern uint16_t &soilMoistureDryValueRef; // Значение датчика влажности почвы, при котором включается полив
-extern uint16_t &soilMoistureWetValueRef; // Значение датчика влажности почвы, при котором выключается полив
-extern bool &isLedStripsOnRef; // Включено ли освещение (по ум: false)
+extern uint32_t &controlTimeRef; // Интервал проверки показаний датчиков (в миллисекундах), при
+                                 // котором выполняется управление чем-либо (открытие окна,
+                                 // включение полива, включение освещения и т.д.)
+extern float &controlTemperatureRef; // Температура, при которой открывается окно (если датчик
+                                     // температуры подключен и используется в работе)
+extern uint16_t &soilMoistureDryValueRef; // Значение датчика влажности почвы,
+                                          // при котором включается полив
+extern uint16_t &soilMoistureWetValueRef; // Значение датчика влажности почвы,
+                                          // при котором выключается полив
 extern bool &isWaterOnRef; // Включен ли полив (по ум: false)
 
 /** WiFi config */
@@ -50,11 +56,12 @@ extern char PASSWORD[21];
  * true - датчик подключен и используется в работе
  * false - датчик не подключен и не используется в работе
  * При отключении датчика, связанный с ним код не выполняется, даже если сейчас рабочее время
- * По умолчанию все датчики отключены и не используются в работе, для исключения ошибок при повторном включении аппарата
+ * По умолчанию все датчики отключены и не используются в работе, для исключения ошибок при
+ * повторном включении аппарата
  */
 extern bool &hasSoilMoistureSensorRef; // Датчик влажности почвы
 extern bool &hasPhotoSensorRef; // Датчик освещённости
-extern bool &hasTemperatureSensorRef;  // Датчик температуры
+extern bool &hasTemperatureSensorRef; // Датчик температуры
 
 /** Time config */
 extern bool &isWorkTimeEnabledRef; // Включено ли рабочее время
