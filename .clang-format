@@ -1,0 +1,31 @@
+Language: Cpp # язык, к которому применяется форматирование
+AccessModifierOffset: -2 # сколько отступов перед ключевым словом public и т.д.
+AlignTrailingComments:
+  Kind: Never # Не выравнивать конечные комментарии, но применяется другой форматер.
+AllowAllParametersOfDeclarationOnNextLine: false # Если объявление функции не помещается на строке, разрешите размещение всех параметров объявления функции на следующей строке
+AllowAllArgumentsOnNextLine: false # Если вызов функции или список инициализаторов в фигурных скобках не помещаются на строке, разрешите размещение всех аргументов на следующей строке
+AllowShortBlocksOnASingleLine: Empty # может быть указано в одной строке: Объединять только пустые блоки
+AllowShortLambdasOnASingleLine: Empty # Объединять только пустые лямбда-функции.
+AllowShortIfStatementsOnASingleLine: WithoutElse # Размещайте короткие операторы if на той же строке только в том случае, если нет оператора else.
+BreakBeforeTernaryOperators: true # тернарные операторы будут размещаться после переносов строк.
+ColumnLimit: 100 # Ограничение по количеству столбцов.
+ContinuationIndentWidth: 2 # Ширина отступа для продолжения строки.
+EmptyLineAfterAccessModifier: Never # Определяет, когда следует добавлять пустую строку после модификаторов доступа.
+EmptyLineBeforeAccessModifier: Always # Определяет, в каких случаях перед модификаторами доступа следует размещать пустую строку.
+IndentWidth: 4 # Количество столбцов, используемых для отступа.
+KeepEmptyLines: # Какие пустые строки сохраняются?
+  AtEndOfFile: false # В конце файла оставляйте пустые строки.
+  AtStartOfFile: false # В начале файла оставляйте пустые строки.
+  AtStartOfBlock: false # В начале блока всегда оставляйте пустые строки.
+MaxEmptyLinesToKeep: 1 # Максимальное количество подряд пустых строк, которые следует сохранить.
+PointerAlignment: Right # Стиль выравнивания указателей и ссылок.
+RemoveEmptyLinesInUnwrappedLines: true # Удалите пустые строки внутри строк без переноса.
+SeparateDefinitionBlocks: Always # Вставьте пустую строку между блоками определений.
+SpaceBeforeParens: Custom # Определяет, в каких случаях следует ставить пробел перед открывающей скобкой.
+SpaceBeforeParensOptions:
+  AfterControlStatements: true # Ставьте пробел перед открывающей скобкой в управляющих конструкциях (if, while, for и т.д.).
+  AfterFunctionDefinitionName: false # Ставьте пробел перед открывающей скобкой в определениях функций.
+  AfterFunctionDeclarationName: false # Ставьте пробел перед открывающей скобкой в объявлениях функций.
+  AfterPlacementOperator: true # поставьте пробел между оператором new/delete и открывающей скобкой.
+SpaceInEmptyBraces: Never # Указывает, когда следует вставлять пробел в пустые фигурные скобки.
+PPIndentWidth: 4 # Количество столбцов, используемых для отступов в операторах препроцессора.

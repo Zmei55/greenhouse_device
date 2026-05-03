@@ -7,13 +7,9 @@ Window::Window(uint8_t motorPinOne, uint8_t motorPinTwo) {
     _motorPinTwo = motorPinTwo;
 }
 
-uint8_t Window::getMotorPinOne() {
-    return _motorPinOne;
-}
+uint8_t Window::getMotorPinOne() { return _motorPinOne; }
 
-uint8_t Window::getMotorPinTwo() {
-    return _motorPinTwo;
-}
+uint8_t Window::getMotorPinTwo() { return _motorPinTwo; }
 
 void Window::open() {
     if (_isMotorOn) throw std::runtime_error("Мотор уже запущен.");
@@ -28,7 +24,7 @@ void Window::open() {
 void Window::close() {
     if (_isMotorOn) throw std::runtime_error("Мотор уже запущен.");
     if (!_isWindowOpen) throw std::runtime_error("Окно уже закрыто.");
-    
+
     digitalWrite(_motorPinOne, LOW);
     analogWrite(_motorPinTwo, 250);
     toggleMotorState();
@@ -41,43 +37,25 @@ void Window::stopMotor() {
     setMotorOff();
 }
 
-uint32_t Window::getRunningMotorTime() {
-    return _runningWindowMotorTime;
-}
+uint32_t Window::getRunningMotorTime() { return _runningWindowMotorTime; }
 
 uint32_t Window::setRunningMotorTime(uint32_t runningTime) {
     _runningWindowMotorTime = runningTime;
     return _runningWindowMotorTime;
 }
 
-bool Window::getIsMotorOn() {
-    return _isMotorOn;
-}
+bool Window::getIsMotorOn() { return _isMotorOn; }
 
-void Window::toggleMotorState() {
-    _isMotorOn = !_isMotorOn;
-}
+void Window::toggleMotorState() { _isMotorOn = !_isMotorOn; }
 
-void Window::setMotorOff() {
-    _isMotorOn = false;
-}
+void Window::setMotorOff() { _isMotorOn = false; }
 
-bool Window::getIsWindowOpen() {
-    return _isWindowOpen;
-}
+bool Window::getIsWindowOpen() { return _isWindowOpen; }
 
-void Window::toggleWindowState() {
-    _isWindowOpen = !_isWindowOpen;
-}
+void Window::toggleWindowState() { _isWindowOpen = !_isWindowOpen; }
 
-uint32_t Window::getMotorStartTime() {
-    return _motorStartTime;
-}
+uint32_t Window::getMotorStartTime() { return _motorStartTime; }
 
-void Window::setMotorStartTime() {
-    _motorStartTime = millis();
-}
+void Window::setMotorStartTime() { _motorStartTime = millis(); }
 
-void Window::resetMotorStartTime() {
-    _motorStartTime = 0;
-}
+void Window::resetMotorStartTime() { _motorStartTime = 0; }
