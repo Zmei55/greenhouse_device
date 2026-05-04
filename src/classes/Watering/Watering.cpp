@@ -8,6 +8,10 @@ Watering::Watering(uint8_t moisturePin, uint8_t pumpOnePin, uint8_t pumpTwoPin) 
 
 uint8_t Watering::getMoisturePin() { return _moisturePin; }
 
+uint8_t Watering::getPumpOnePin() { return _pumpOnePin; }
+
+uint8_t Watering::getPumpTwoPin() { return _pumpTwoPin; }
+
 void Watering::enable() {
     if (_isPumpOn) throw std::runtime_error("Насос уже запущен.");
 

@@ -24,6 +24,12 @@ class Watering {
     /** Получить значение пина датчика влажности */
     uint8_t getMoisturePin();
 
+    /** Получить значение пина насоса 1 */
+    uint8_t getPumpOnePin();
+
+    /** Получить значение пина насоса 2 */
+    uint8_t getPumpTwoPin();
+
     /** Включение полива */
     void enable();
 
