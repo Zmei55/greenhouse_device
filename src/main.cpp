@@ -7,7 +7,7 @@
 #include "config.h"
 
 void checkSensors();
-void stopingWindowMotor(uint32_t startMotor, uint32_t delay);
+void stopingWindowMotor(const uint32_t &startMotor, const uint32_t &delay);
 
 void setup() {
     Serial.begin(115200);
@@ -107,7 +107,7 @@ void checkSensors() {
  * @param startMotor начало работы мотора
  * @param delay время, через которое мотор должен остановиться
  */
-void stopingWindowMotor(uint32_t startMotor, uint32_t delay) {
+void stopingWindowMotor(const uint32_t &startMotor, const uint32_t &delay) {
     if (millis() - startMotor >= delay) {
         window.stopMotor();
         window.toggleWindowState();
