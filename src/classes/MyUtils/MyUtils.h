@@ -14,16 +14,4 @@ class MyUtils {
      * @return целое число от 00:00:00
      */
     uint32_t getNowTimeToInt(const DateTime &time);
-
-    /**
-     * Включение полива
-     * @param flag включен ли полив (bool)
-     */
-    void enablingWatering(bool &flag);
-
-    /**
-     * Выключение полива
-     * @param flag включен ли полив (bool)
-     */
-    void disablingWatering(bool &flag);
 };

@@ -9,21 +9,14 @@ MyTimer timer;
 MyUtils utils;
 Window window(MOTOR_IN_1_PIN, MOTOR_IN_2_PIN);
 Lighting lighting(LIGHT_SENSOR_PIN, LED_STRIP_ONE_PIN, LED_STRIP_TWO_PIN, LED_STRIP_THREE_PIN);
+Watering watering(SOIL_MOISTURE_PIN, PUMPE_IN_1_PIN, PUMPE_IN_2_PIN);
 
 /** General settings */
-uint32_t controlTime = 1000; // Интервал проверки показаний датчиков (в миллисекундах),
-                             // при котором выполняется управление чем-либо (открытие окна,
-                             // включение полива, включение освещения и т.д.)
+uint32_t controlTime = 1000;
 float controlTemperature = 24.0;
-uint16_t soilMoistureDryValue = 3750;
-uint16_t soilMoistureWetValue = 3600;
-bool isWaterOn = false;
 
 uint32_t &controlTimeRef = controlTime;
 float &controlTemperatureRef = controlTemperature;
-uint16_t &soilMoistureDryValueRef = soilMoistureDryValue;
-uint16_t &soilMoistureWetValueRef = soilMoistureWetValue;
-bool &isWaterOnRef = isWaterOn;
 
 /** WiFi config */
 char SSID[21] = "greenhouse";
@@ -40,8 +33,8 @@ bool &hasTemperatureSensorRef = hasTemperatureSensor;
 
 /** Time config */
 bool isWorkTimeEnabled = false;
-WorkTime start = WorkTime(); // Время начала работы аппарата (09:00)
-WorkTime end = WorkTime(); // Время окончания работы аппарата (20:00)
+WorkTime start = WorkTime();
+WorkTime end = WorkTime();
 
 bool &isWorkTimeEnabledRef = isWorkTimeEnabled;
 WorkTime &WTStartRef = start;

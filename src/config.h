@@ -7,6 +7,7 @@
 
 #include "classes/Lighting/Lighting.h"
 #include "classes/MyUtils/MyUtils.h"
+#include "classes/Watering/Watering.h"
 #include "classes/Window/Window.h"
 #include "classes/WorkTime/WorkTime.h"
 
@@ -23,6 +24,7 @@ extern MyUtils utils;
 extern AsyncWebServer server;
 extern Window window;
 extern Lighting lighting;
+extern Watering watering;
 
 /** Pins */
 
@@ -30,8 +32,8 @@ extern Lighting lighting;
 #if defined(ESP32)
 #define MOTOR_IN_1_PIN 0
 #define MOTOR_IN_2_PIN 1
-// #define WATER_IN_3_PIN 20
-// #define WATER_IN_4_PIN 10
+#define PUMPE_IN_1_PIN 20
+#define PUMPE_IN_2_PIN 10
 #define LED_STRIP_ONE_PIN 5
 #define LED_STRIP_TWO_PIN 6
 #define LED_STRIP_THREE_PIN 7
@@ -45,16 +47,8 @@ extern Lighting lighting;
 // #endif
 
 /** General settings */
-extern uint32_t &controlTimeRef; // Интервал проверки показаний датчиков (в миллисекундах), при
-                                 // котором выполняется управление чем-либо (открытие окна,
-                                 // включение полива, включение освещения и т.д.)
-extern float &controlTemperatureRef; // Температура, при которой открывается окно (если датчик
-                                     // температуры подключен и используется в работе)
-extern uint16_t &soilMoistureDryValueRef; // Значение датчика влажности почвы,
-                                          // при котором включается полив
-extern uint16_t &soilMoistureWetValueRef; // Значение датчика влажности почвы,
-                                          // при котором выключается полив
-extern bool &isWaterOnRef; // Включен ли полив (по ум: false)
+extern uint32_t &controlTimeRef; // Интервал проверки показаний датчиков (в миллисекундах), при котором выполняется управление чем-либо (открытие окна, включение полива, включение освещения и т.д.)
+extern float &controlTemperatureRef; // Температура, при которой открывается окно (если датчик температуры подключен и используется в работе)
 
 /** WiFi config */
 extern char SSID[21];
