@@ -7,7 +7,9 @@
 
 JsonDocument getCurrentTimeAsJson();
 JsonDocument getSettingsValueAsJson();
+void saveSensorsValue(JsonObject body);
 void saveRuntimeToWindow(uint8_t body);
+void saveWorkingTime(JsonObject body, JsonDocument &error);
 
 void apiHandler() {
     /** Проверка авторизации (подключился ли аппарат) */
@@ -81,40 +83,12 @@ void apiHandler() {
         JsonDocument error;
         JsonObject body = json.as<JsonObject>();
 
-        /** Включение / выключение сенсоров */
-        JsonObject sensors = body["sensors"];
-        hasSoilMoistureSensorRef = sensors["soilMoisture"];
-        hasPhotoSensorRef = sensors["photo"];
-        hasTemperatureSensorRef = sensors["temperature"];
-        /** Установка значение контрольной температуры */
-        controlTemperatureRef = body["controlTemperature"];
-        /** Установка значение контрольного времени (интервала проверки показаний датчиков) в миллисекундах */
-        controlTimeRef = (int)body["controlTime"] * 1000;
-        /** Установка значение времени работы мотора окна в миллисекундах */
-        saveRuntimeToWindow(body["runningTime"]);
+        saveSensorsValue(body["sensors"]); // Включение / выключение сенсоров
+        controlTemperatureRef = body["controlTemperature"]; // Установка значение контрольной температуры
+        controlTimeRef = (int)body["controlTime"] * 1000; // Установка значение контрольного времени (интервала проверки показаний датчиков) в миллисекундах
+        saveRuntimeToWindow(body["runningTime"]); // Установка значение времени работы мотора окна в миллисекундах
 
-        /** Установка рабочего времени */
-        JsonObject workingHours = body["workingHours"];
-        bool isEnabled = workingHours["isEnabled"];
-
-        if (isEnabled) {
-            int8_t start_hour = workingHours["start"]["hour"];
-            int8_t start_minute = workingHours["start"]["minute"];
-            int8_t end_hour = workingHours["end"]["hour"];
-            int8_t end_minute = workingHours["end"]["minute"];
-
-            try {
-                WTStartRef.set(start_hour, start_minute);
-                WTEndRef.set(end_hour, end_minute);
-                isWorkTimeEnabledRef = isEnabled;
-            } catch (const std::exception &e) {
-                error["message"] = e.what();
-            }
-        } else {
-            isWorkTimeEnabledRef = false;
-            WTStartRef.reset();
-            WTEndRef.reset();
-        }
+        saveWorkingTime(body["workingHours"], error); // Установка рабочего времени
 
         if (error.isNull()) {
             request->send(200, "application/json", getSettingsValueAsJson().as<String>());
@@ -251,6 +225,18 @@ JsonDocument getSensorsValue() {
 }
 
 /**
+ * Сохранить состояние сенсоров
+ * @param body значения состояния сенсоров, полученные от клиента (JsonObject)
+ * true - включен
+ * false - выключен
+ */
+void saveSensorsValue(JsonObject body) {
+    hasSoilMoistureSensorRef = body["soilMoisture"];
+    hasPhotoSensorRef = body["photo"];
+    hasTemperatureSensorRef = body["temperature"];
+}
+
+/**
  * Получить значения влажности почвы, при которых включается и выключается полив
  * WET - сухой
  * DRY - мокрый
@@ -298,4 +284,33 @@ uint32_t getRuntimeFromJson(uint8_t body) {
 void saveRuntimeToWindow(uint8_t body) {
     uint32_t runningTime = getRuntimeFromJson(body);
     window.setRunningMotorTime(runningTime);
+}
+
+/**
+ * Сохранить рабочее время устройства
+ * @param body объект с данными рабочего времени
+ * @param error объект для сохранения ошибки, если данные рабочего времени некорректные
+ * @throws std::runtime_error если данные рабочего времени некорректные
+ */
+void saveWorkingTime(JsonObject body, JsonDocument &error) {
+    bool isEnabled = body["isEnabled"];
+
+    if (isEnabled) {
+        int8_t start_hour = body["start"]["hour"];
+        int8_t start_minute = body["start"]["minute"];
+        int8_t end_hour = body["end"]["hour"];
+        int8_t end_minute = body["end"]["minute"];
+
+        try {
+            WTStartRef.set(start_hour, start_minute);
+            WTEndRef.set(end_hour, end_minute);
+            isWorkTimeEnabledRef = isEnabled;
+        } catch (const std::exception &e) {
+            error["message"] = e.what();
+        }
+    } else {
+        isWorkTimeEnabledRef = false;
+        WTStartRef.reset();
+        WTEndRef.reset();
+    }
 }
