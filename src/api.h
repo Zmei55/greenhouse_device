@@ -1,5 +1,6 @@
 #pragma once
 
+#include "./enums.h"
 #include "./sensors/ds3231.h"
 #include "./sensors/thermometer.h"
 #include "config.h"
@@ -71,7 +72,7 @@ void apiHandler() {
     });
 
     /**
-     * Получение с клиента новых настроек
+     * Получить с клиента новых настроек
      * Установка новых настроек
      * @param json объект с новыми настройками
      * @return новый объект настроек
@@ -200,7 +201,7 @@ void apiHandler() {
 }
 
 /**
- * Получает даты и времени устройства (датчика реального времени DS3231) в формате json
+ * Получить даты и времени устройства (датчика реального времени DS3231) в формате json
  * @return дату и время устройства (JsonDocument)
  */
 JsonDocument getCurrentTimeAsJson() {
@@ -211,7 +212,7 @@ JsonDocument getCurrentTimeAsJson() {
 }
 
 /**
- * Получает рабочее время устройства в формате json
+ * Получить рабочее время устройства в формате json
  * @return рабочее время устройства (JsonDocument)
  */
 JsonDocument getWorkingTimeAsJson() {
@@ -236,7 +237,7 @@ JsonDocument getWorkingTimeAsJson() {
 }
 
 /**
- * Получение состояния сенсоров
+ * Получить состояние сенсоров
  * true - включен
  * false - выключен
  * @return значения состояния сенсоров (JsonDocument)
@@ -250,7 +251,20 @@ JsonDocument getSensorsValue() {
 }
 
 /**
- * Получение состояния настроек
+ * Получить значения влажности почвы, при которых включается и выключается полив
+ * WET - сухой
+ * DRY - мокрый
+ * @return значения влажности почвы (JsonDocument)
+ */
+JsonDocument getSoilMoistureValuesAsJson() {
+    JsonDocument data;
+    data["dry"] = watering.getSoilMoistureValue(SoilMoisture::DRY);
+    data["wet"] = watering.getSoilMoistureValue(SoilMoisture::WET);
+    return data;
+}
+
+/**
+ * Получить состояние настроек
  * @return значения настроек (JsonDocument)
  */
 JsonDocument getSettingsValueAsJson() {
@@ -259,6 +273,7 @@ JsonDocument getSettingsValueAsJson() {
     data["controlTemperature"] = controlTemperatureRef; // Получение значения температуры, для управления ч-либо
     data["controlTime"] = controlTimeRef / 1000; // Получение значения интервала проверки сенсоров в секундах
     data["runningTime"] = window.getRunningMotorTime() / 1000; // Получения значения времени, в течении которого работает мотор окна (в секундах)
+    data["soil"] = getSoilMoistureValuesAsJson();
     data["workingHours"] = getWorkingTimeAsJson(); // Рабочее время аппарата
     return data;
 }
