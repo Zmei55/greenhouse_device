@@ -7,9 +7,9 @@
 
 JsonDocument getCurrentTimeAsJson();
 JsonDocument getSettingsValueAsJson();
-void saveSensorsValue(JsonObject body);
-void saveRuntimeToWindow(uint8_t body);
-void saveWorkingTime(JsonObject body, JsonDocument &error);
+void saveSensorsValue(const JsonObject &body);
+void saveRuntimeToWindow(const uint8_t &body);
+void saveWorkingTime(const JsonObject &body, JsonDocument &error);
 
 void apiHandler() {
     /** Проверка авторизации (подключился ли аппарат) */
@@ -230,7 +230,7 @@ JsonDocument getSensorsValue() {
  * true - включен
  * false - выключен
  */
-void saveSensorsValue(JsonObject body) {
+void saveSensorsValue(const JsonObject &body) {
     hasSoilMoistureSensorRef = body["soilMoisture"];
     hasPhotoSensorRef = body["photo"];
     hasTemperatureSensorRef = body["temperature"];
@@ -269,7 +269,7 @@ JsonDocument getSettingsValueAsJson() {
  * @param body время, в течении которого надо открывать окно (в секундах)
  * @return время, в течении которого надо открывать окно (в миллисекундах)
  */
-uint32_t getRuntimeFromJson(uint8_t body) {
+uint32_t getRuntimeFromJson(const uint8_t &body) {
     uint32_t runningTime = body;
     if (runningTime <= 0) throw std::runtime_error("Время открывания/закрывания окна не может быть равно или меньше нуля.");
 
@@ -281,7 +281,7 @@ uint32_t getRuntimeFromJson(uint8_t body) {
  * Сохранить время работы открывания окна в объекте Window
  * @param body время, в течении которого надо открывать окно (в секундах)
  */
-void saveRuntimeToWindow(uint8_t body) {
+void saveRuntimeToWindow(const uint8_t &body) {
     uint32_t runningTime = getRuntimeFromJson(body);
     window.setRunningMotorTime(runningTime);
 }
@@ -292,7 +292,7 @@ void saveRuntimeToWindow(uint8_t body) {
  * @param error объект для сохранения ошибки, если данные рабочего времени некорректные
  * @throws std::runtime_error если данные рабочего времени некорректные
  */
-void saveWorkingTime(JsonObject body, JsonDocument &error) {
+void saveWorkingTime(const JsonObject &body, JsonDocument &error) {
     bool isEnabled = body["isEnabled"];
 
     if (isEnabled) {
