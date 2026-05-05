@@ -40,6 +40,8 @@ void Window::stopMotor() {
 uint32_t Window::getRunningMotorTime() { return _runningWindowMotorTime; }
 
 uint32_t Window::setRunningMotorTime(uint32_t runningTime) {
+    if (runningTime <= 0) throw std::runtime_error("Время работы мотора не может быть отрицательным или равно нулю.");
+
     _runningWindowMotorTime = runningTime;
     return _runningWindowMotorTime;
 }
