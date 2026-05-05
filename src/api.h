@@ -8,7 +8,7 @@
 JsonDocument getCurrentTimeAsJson();
 JsonDocument getSettingsValueAsJson();
 void saveSensorsValue(const JsonObject &body);
-void saveRuntimeToWindow(const uint8_t &body);
+void saveRunTimeToWindow(const uint8_t &body);
 void saveWorkingTime(const JsonObject &body, JsonDocument &error);
 
 void apiHandler() {
@@ -86,8 +86,7 @@ void apiHandler() {
         saveSensorsValue(body["sensors"]); // Включение / выключение сенсоров
         controlTemperatureRef = body["controlTemperature"]; // Установка значение контрольной температуры
         controlTimeRef = (int)body["controlTime"] * 1000; // Установка значение контрольного времени (интервала проверки показаний датчиков) в миллисекундах
-        saveRuntimeToWindow(body["runningTime"]); // Установка значение времени работы мотора окна в миллисекундах
-
+        saveRunTimeToWindow(body["runningTime"]); // Установка значение времени работы мотора окна в миллисекундах
         saveWorkingTime(body["workingHours"], error); // Установка рабочего времени
 
         if (error.isNull()) {
@@ -146,7 +145,7 @@ void apiHandler() {
         JsonObject body = json.as<JsonObject>();
 
         try {
-            saveRuntimeToWindow(body["runningTime"]);
+            saveRunTimeToWindow(body["runningTime"]);
             window.open();
             request->send(200);
         } catch (const std::exception &e) {
@@ -164,7 +163,7 @@ void apiHandler() {
         JsonObject body = json.as<JsonObject>();
 
         try {
-            saveRuntimeToWindow(body["runningTime"]);
+            saveRunTimeToWindow(body["runningTime"]);
             window.close();
             request->send(200);
         } catch (const std::exception &e) {
@@ -281,7 +280,7 @@ uint32_t getRuntimeFromJson(const uint8_t &body) {
  * Сохранить время работы открывания окна в объекте Window
  * @param body время, в течении которого надо открывать окно (в секундах)
  */
-void saveRuntimeToWindow(const uint8_t &body) {
+void saveRunTimeToWindow(const uint8_t &body) {
     uint32_t runningTime = getRuntimeFromJson(body);
     window.setRunningMotorTime(runningTime);
 }
