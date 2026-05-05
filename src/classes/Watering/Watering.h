@@ -49,7 +49,7 @@ class Watering {
      * @param SoilMoisture enum DRY/WET
      * @return значение влажности
      */
-    uint16_t getSoilMoistureValue(SoilMoisture value);
+    uint16_t getSoilMoistureValue(SoilMoisture moisture);
 
     /**
      * Установить значение, при котором нужно включить/выключить насос
@@ -58,12 +58,26 @@ class Watering {
      * @param value значение влажности, при котором нужно включить/выключить насос
      * @return новое значение влажности, сохранённое в системе
      */
-    uint16_t setSoilMoistureValue(SoilMoisture value);
+    uint16_t setSoilMoistureValue(SoilMoisture moisture, uint16_t value);
+
+    /**
+     * Получить значение давления воды
+     * @return значение давления воды
+     */
+    uint16_t getWaterPressureValue();
+
+    /**
+     * Установить значение давления воды
+     * @param newValue значение давления воды
+     * @return новое значение давления воды, сохранённое в системе
+     */
+    uint16_t setWaterPressureValue(int16_t newValue);
 
   private:
     int8_t _moisturePin = -1;
     int8_t _pumpOnePin = -1;
     int8_t _pumpTwoPin = -1;
+    int16_t _waterPressure = 100;
     uint16_t _soilDryValue = 3700; // Значение датчика влажности почвы, при котором выключается полив
     uint16_t _soilWetValue = 2700; // Значение датчика влажности почвы, при котором включается полив
     bool _isPumpOn = false; // Состояние насоса (вкл/выкл); по умолчанию: выкл
