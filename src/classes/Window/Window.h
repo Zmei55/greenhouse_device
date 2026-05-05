@@ -68,8 +68,7 @@ class Window {
   private:
     int8_t _motorPinOne = -1;
     int8_t _motorPinTwo = -1;
-    uint32_t _runningWindowMotorTime = 5000; // Время, в течение которого мотор
-                                             // открывает/закрывает окно(в миллисекундах)
+    uint32_t _runningWindowMotorTime = 5000; // Время, в течение которого мотор открывает/закрывает окно(в миллисекундах)
     uint32_t _motorStartTime = 0; // Время начала работы мотора (в миллисекундах)
     bool _isMotorOn = false; // Включен ли мотор (по ум: false / выключен)
     bool _isWindowOpen = false; // Открыто ли окно (по ум: false / закрыто)

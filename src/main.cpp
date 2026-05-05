@@ -7,7 +7,7 @@
 #include "config.h"
 
 void checkSensors();
-void stopingWindowMotor(uint32_t startMotor, uint32_t delay);
+void stopingWindowMotor(const uint32_t &startMotor, const uint32_t &delay);
 
 void setup() {
     Serial.begin(115200);
@@ -22,15 +22,15 @@ void setup() {
     pinMode(lighting.getLedStripOnePin(), OUTPUT);
     pinMode(lighting.getLedStripTwoPin(), OUTPUT);
     pinMode(lighting.getLedStripThreePin(), OUTPUT);
-    // pinMode(SOIL_MOISTURE_PIN, INPUT);
+    pinMode(watering.getMoisturePin(), INPUT);
+    pinMode(watering.getPumpOnePin(), OUTPUT);
+    pinMode(watering.getPumpTwoPin(), OUTPUT);
     pinMode(THERMOMETER_PIN, INPUT);
     pinMode(window.getMotorPinOne(), OUTPUT);
     pinMode(window.getMotorPinTwo(), OUTPUT);
 
-    term.setResolution(12); // Установка разрешения датчика температуры (9-12 бит, чем выше, тем
-                            // точнее, но дольше измерение)
-    term.requestTemp(); // Запрос на измерение температуры (необходимо для получения данных при
-                        // первом вызове term.tick())
+    term.setResolution(12); // Установка разрешения датчика температуры (9-12 бит, чем выше, тем точнее, но дольше измерение)
+    term.requestTemp(); // Запрос на измерение температуры (необходимо для получения данных при первом вызове term.tick())
 
     apiHandler();
     server.begin();
@@ -107,7 +107,7 @@ void checkSensors() {
  * @param startMotor начало работы мотора
  * @param delay время, через которое мотор должен остановиться
  */
-void stopingWindowMotor(uint32_t startMotor, uint32_t delay) {
+void stopingWindowMotor(const uint32_t &startMotor, const uint32_t &delay) {
     if (millis() - startMotor >= delay) {
         window.stopMotor();
         window.toggleWindowState();

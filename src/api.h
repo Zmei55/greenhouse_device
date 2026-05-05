@@ -2,11 +2,8 @@
 
 #include "./sensors/ds3231.h"
 #include "./sensors/thermometer.h"
+#include "apiHelpers.h"
 #include "config.h"
-
-JsonDocument getCurrentTimeAsJson();
-JsonDocument getSettingsValueAsJson();
-void saveRuntimeToWindow(uint8_t body);
 
 void apiHandler() {
     /** Проверка авторизации (подключился ли аппарат) */
@@ -71,7 +68,7 @@ void apiHandler() {
     });
 
     /**
-     * Получение с клиента новых настроек
+     * Получить с клиента новых настроек
      * Установка новых настроек
      * @param json объект с новыми настройками
      * @return новый объект настроек
@@ -80,41 +77,12 @@ void apiHandler() {
         JsonDocument error;
         JsonObject body = json.as<JsonObject>();
 
-        /** Включение / выключение сенсоров */
-        JsonObject sensors = body["sensors"];
-        hasSoilMoistureSensorRef = sensors["soilMoisture"];
-        hasPhotoSensorRef = sensors["photo"];
-        hasTemperatureSensorRef = sensors["temperature"];
-        /** Установка значение контрольной температуры */
-        controlTemperatureRef = body["controlTemperature"];
-        /** Установка значение контрольного времени (интервала проверки показаний датчиков) в
-         * миллисекундах */
-        controlTimeRef = (int)body["controlTime"] * 1000;
-        /** Установка значение времени работы мотора окна в миллисекундах */
-        saveRuntimeToWindow(body["runningTime"]);
-
-        /** Установка рабочего времени */
-        JsonObject workingHours = body["workingHours"];
-        bool isEnabled = workingHours["isEnabled"];
-
-        if (isEnabled) {
-            int8_t start_hour = workingHours["start"]["hour"];
-            int8_t start_minute = workingHours["start"]["minute"];
-            int8_t end_hour = workingHours["end"]["hour"];
-            int8_t end_minute = workingHours["end"]["minute"];
-
-            try {
-                WTStartRef.set(start_hour, start_minute);
-                WTEndRef.set(end_hour, end_minute);
-                isWorkTimeEnabledRef = isEnabled;
-            } catch (const std::exception &e) {
-                error["message"] = e.what();
-            }
-        } else {
-            isWorkTimeEnabledRef = false;
-            WTStartRef.reset();
-            WTEndRef.reset();
-        }
+        controlTemperatureRef = body["controlTemperature"]; // Установка значение контрольной температуры
+        controlTimeRef = (int)body["controlTime"] * 1000; // Установка значение контрольного времени (интервала проверки показаний датчиков) в миллисекундах
+        saveSensorsValue(body["sensors"]); // Включение / выключение сенсоров
+        saveRunTimeToWindow(body["runningTime"], error); // Установка значение времени работы мотора окна в миллисекундах
+        saveWatering(body["watering"], error); // Установка значений влажности почвы, при которых нужно включать и выключать полив
+        saveWorkingTime(body["workingHours"], error); // Установка рабочего времени
 
         if (error.isNull()) {
             request->send(200, "application/json", getSettingsValueAsJson().as<String>());
@@ -139,143 +107,63 @@ void apiHandler() {
 
     /** Тестирование водяного насоса (включение насоса) */
     server.on("/tests/water-pump/on", HTTP_GET, [](AsyncWebServerRequest *request) {
-        utils.enablingWatering(isWaterOnRef);
-        request->send(200);
+        JsonDocument error;
+
+        try {
+            watering.enable();
+            request->send(200);
+        } catch (const std::exception &e) {
+            error["message"] = e.what();
+            request->send(400, "application/json", error.as<String>());
+        }
     });
 
     /** Тестирование водяного насоса (выключение насоса) */
     server.on("/tests/water-pump/off", HTTP_GET, [](AsyncWebServerRequest *request) {
-        utils.disablingWatering(isWaterOnRef);
-        request->send(200);
+        JsonDocument error;
+
+        try {
+            watering.disable();
+            request->send(200);
+        } catch (const std::exception &e) {
+            error["message"] = e.what();
+            request->send(400, "application/json", error.as<String>());
+        }
     });
 
     /**
      * Тестирование мотора (открытие окна)
      * @param json объект с указанием времени, в течении которого мотор открывает окно (в секундах)
      */
-    server.on("/tests/window/open", HTTP_POST,
-              [](AsyncWebServerRequest *request, JsonVariant &json) {
-                  JsonDocument error;
-                  JsonObject body = json.as<JsonObject>();
+    server.on("/tests/window/open", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json) {
+        JsonDocument error;
+        JsonObject body = json.as<JsonObject>();
 
-                  try {
-                      saveRuntimeToWindow(body["runningTime"]);
-                      window.open();
-                      request->send(200);
-                  } catch (const std::exception &e) {
-                      error["message"] = e.what();
-                      request->send(400, "application/json", error.as<String>());
-                  }
-              });
+        try {
+            saveRunTimeToWindow(body["runningTime"], error);
+            window.open();
+            request->send(200);
+        } catch (const std::exception &e) {
+            error["message"] = e.what();
+            request->send(400, "application/json", error.as<String>());
+        }
+    });
 
     /**
      * Тестирование мотора (закрытие окна)
      * @param json объект с новыми настройками
      */
-    server.on("/tests/window/close", HTTP_POST,
-              [](AsyncWebServerRequest *request, JsonVariant &json) {
-                  JsonDocument error;
-                  JsonObject body = json.as<JsonObject>();
+    server.on("/tests/window/close", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json) {
+        JsonDocument error;
+        JsonObject body = json.as<JsonObject>();
 
-                  try {
-                      saveRuntimeToWindow(body["runningTime"]);
-                      window.close();
-                      request->send(200);
-                  } catch (const std::exception &e) {
-                      error["message"] = e.what();
-                      request->send(400, "application/json", error.as<String>());
-                  }
-              });
-}
-
-/**
- * Получает даты и времени устройства (датчика реального времени DS3231) в формате json
- * @return дату и время устройства (JsonDocument)
- */
-JsonDocument getCurrentTimeAsJson() {
-    JsonDocument data;
-    char buf[] = "YYYY-MM-DDThh:mm:ss";
-    data["deviceDateTime"] = rtc.now().toString(buf);
-    return data;
-}
-
-/**
- * Получает рабочее время устройства в формате json
- * @return рабочее время устройства (JsonDocument)
- */
-JsonDocument getWorkingTimeAsJson() {
-    JsonDocument data;
-    data["isEnabled"] = isWorkTimeEnabledRef;
-    data["start"] = nullptr;
-    data["end"] = nullptr;
-
-    if (!WTStartRef.isEmpty()) {
-        JsonObject startTime = data["start"].to<JsonObject>();
-        startTime["hour"] = WTStartRef.getHour();
-        startTime["minute"] = WTStartRef.getMinute();
-    }
-
-    if (!WTEndRef.isEmpty()) {
-        JsonObject endTime = data["end"].to<JsonObject>();
-        endTime["hour"] = WTEndRef.getHour();
-        endTime["minute"] = WTEndRef.getMinute();
-    }
-
-    return data;
-}
-
-/**
- * Получение состояния сенсоров
- * true - включен
- * false - выключен
- * @return значения состояния сенсоров (JsonDocument)
- */
-JsonDocument getSensorsValue() {
-    JsonDocument data;
-    data["soilMoisture"] = hasSoilMoistureSensorRef;
-    data["photo"] = hasPhotoSensorRef;
-    data["temperature"] = hasTemperatureSensorRef;
-    return data;
-}
-
-/**
- * Получение состояния настроек
- * @return значения настроек (JsonDocument)
- */
-JsonDocument getSettingsValueAsJson() {
-    JsonDocument data;
-    data["sensors"] = getSensorsValue(); // Какие сенсоры включены, а какие выключены
-    data["controlTemperature"] = controlTemperatureRef; // Получение значения температуры,
-                                                        // для управления ч-либо
-    data["controlTime"] = controlTimeRef / 1000; // Получение значения интервала
-                                                 // проверки сенсоров в секундах
-    data["runningTime"] = window.getRunningMotorTime() / 1000; // Получения значения времени,
-                                                               // в течении которого работает
-                                                               // мотор окна (в секундах)
-    data["workingHours"] = getWorkingTimeAsJson(); // Рабочее время аппарата
-    return data;
-}
-
-/**
- * Получить время работы открывания окна из json
- * @param body время, в течении которого надо открывать окно (в секундах)
- * @return время, в течении которого надо открывать окно (в миллисекундах)
- */
-uint32_t getRuntimeFromJson(uint8_t body) {
-    uint32_t runningTime = body;
-    if (runningTime <= 0)
-        throw std::runtime_error(
-          "Время открывания/закрывания окна не может быть равно или меньше нуля.");
-
-    runningTime *= 1000; // переводит секунды в миллисекунды
-    return runningTime;
-}
-
-/**
- * Сохранить время работы открывания окна в объекте Window
- * @param body время, в течении которого надо открывать окно (в секундах)
- */
-void saveRuntimeToWindow(uint8_t body) {
-    uint32_t runningTime = getRuntimeFromJson(body);
-    window.setRunningMotorTime(runningTime);
+        try {
+            saveRunTimeToWindow(body["runningTime"], error);
+            window.close();
+            request->send(200);
+        } catch (const std::exception &e) {
+            error["message"] = e.what();
+            request->send(400, "application/json", error.as<String>());
+        }
+    });
 }
