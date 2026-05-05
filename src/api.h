@@ -88,7 +88,7 @@ void apiHandler() {
         controlTimeRef = (int)body["controlTime"] * 1000; // Установка значение контрольного времени (интервала проверки показаний датчиков) в миллисекундах
         saveSensorsValue(body["sensors"]); // Включение / выключение сенсоров
         saveRunTimeToWindow(body["runningTime"], error); // Установка значение времени работы мотора окна в миллисекундах
-        saveWatering(body["soil"], error); // Установка значений влажности почвы, при которых нужно включать и выключать полив
+        saveWatering(body["watering"], error); // Установка значений влажности почвы, при которых нужно включать и выключать полив
         saveWorkingTime(body["workingHours"], error); // Установка рабочего времени
 
         if (error.isNull()) {
@@ -309,12 +309,6 @@ void saveWatering(const JsonObject &body, JsonDocument &error) {
     JsonObject soil = body["soil"];
     int16_t drySoil = soil["dry"];
     int16_t wetSoil = soil["wet"];
-
-    if (waterPressure < 0) throw std::runtime_error("API. Давление воды не может быть отрицательным.");
-    if ((drySoil < 0) || (wetSoil < 0)) throw std::runtime_error("API. Значение влажности не может быть ниже нуля.");
-    if (drySoil < wetSoil) throw std::runtime_error("API. Значение мокрой почвы не может быть ниже сухой почвы.");
-    if (drySoil > SoilMoistureLevel::MAX) throw std::runtime_error("API. Значение влажной почвы не может быть выше максимального.");
-    if (wetSoil < SoilMoistureLevel::MIN) throw std::runtime_error("API. Значение сухой почвы не может быть ниже минимального.");
 
     try {
         watering.setWaterPressureValue(waterPressure);
