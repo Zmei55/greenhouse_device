@@ -8,7 +8,8 @@
 JsonDocument getCurrentTimeAsJson();
 JsonDocument getSettingsValueAsJson();
 void saveSensorsValue(const JsonObject &body);
-void saveRunTimeToWindow(const uint8_t &body);
+void saveRunTimeToWindow(const uint8_t &body, JsonDocument &error);
+void saveWatering(const JsonObject &body, JsonDocument &error);
 void saveWorkingTime(const JsonObject &body, JsonDocument &error);
 
 void apiHandler() {
@@ -83,10 +84,11 @@ void apiHandler() {
         JsonDocument error;
         JsonObject body = json.as<JsonObject>();
 
-        saveSensorsValue(body["sensors"]); // Включение / выключение сенсоров
         controlTemperatureRef = body["controlTemperature"]; // Установка значение контрольной температуры
         controlTimeRef = (int)body["controlTime"] * 1000; // Установка значение контрольного времени (интервала проверки показаний датчиков) в миллисекундах
-        saveRunTimeToWindow(body["runningTime"]); // Установка значение времени работы мотора окна в миллисекундах
+        saveSensorsValue(body["sensors"]); // Включение / выключение сенсоров
+        saveRunTimeToWindow(body["runningTime"], error); // Установка значение времени работы мотора окна в миллисекундах
+        saveWatering(body["soil"], error); // Установка значений влажности почвы, при которых нужно включать и выключать полив
         saveWorkingTime(body["workingHours"], error); // Установка рабочего времени
 
         if (error.isNull()) {
@@ -145,7 +147,7 @@ void apiHandler() {
         JsonObject body = json.as<JsonObject>();
 
         try {
-            saveRunTimeToWindow(body["runningTime"]);
+            saveRunTimeToWindow(body["runningTime"], error);
             window.open();
             request->send(200);
         } catch (const std::exception &e) {
@@ -163,7 +165,7 @@ void apiHandler() {
         JsonObject body = json.as<JsonObject>();
 
         try {
-            saveRunTimeToWindow(body["runningTime"]);
+            saveRunTimeToWindow(body["runningTime"], error);
             window.close();
             request->send(200);
         } catch (const std::exception &e) {
@@ -237,14 +239,18 @@ void saveSensorsValue(const JsonObject &body) {
 
 /**
  * Получить значения влажности почвы, при которых включается и выключается полив
+ * Получить значения полива
  * WET - сухой
  * DRY - мокрый
  * @return значения влажности почвы (JsonDocument)
  */
-JsonDocument getSoilMoistureValuesAsJson() {
+JsonDocument getWateringValuesAsJson() {
     JsonDocument data;
-    data["dry"] = watering.getSoilMoistureValue(SoilMoisture::DRY);
-    data["wet"] = watering.getSoilMoistureValue(SoilMoisture::WET);
+    data["waterPressure"] = watering.getWaterPressureValue();
+
+    JsonObject soil = data["soil"].to<JsonObject>();
+    soil["dry"] = watering.getSoilMoistureValue(SoilMoisture::DRY);
+    soil["wet"] = watering.getSoilMoistureValue(SoilMoisture::WET);
     return data;
 }
 
@@ -258,7 +264,7 @@ JsonDocument getSettingsValueAsJson() {
     data["controlTemperature"] = controlTemperatureRef; // Получение значения температуры, для управления ч-либо
     data["controlTime"] = controlTimeRef / 1000; // Получение значения интервала проверки сенсоров в секундах
     data["runningTime"] = window.getRunningMotorTime() / 1000; // Получения значения времени, в течении которого работает мотор окна (в секундах)
-    data["soil"] = getSoilMoistureValuesAsJson();
+    data["watering"] = getWateringValuesAsJson();
     data["workingHours"] = getWorkingTimeAsJson(); // Рабочее время аппарата
     return data;
 }
@@ -270,7 +276,7 @@ JsonDocument getSettingsValueAsJson() {
  */
 uint32_t getRuntimeFromJson(const uint8_t &body) {
     uint32_t runningTime = body;
-    if (runningTime <= 0) throw std::runtime_error("Время открывания/закрывания окна не может быть равно или меньше нуля.");
+    if (runningTime <= 0) throw std::runtime_error("API. Время открывания/закрывания окна не может быть равно или меньше нуля.");
 
     runningTime *= 1000; // переводит секунды в миллисекунды
     return runningTime;
@@ -279,10 +285,44 @@ uint32_t getRuntimeFromJson(const uint8_t &body) {
 /**
  * Сохранить время работы открывания окна в объекте Window
  * @param body время, в течении которого надо открывать окно (в секундах)
+ * @param error объект для сохранения ошибки, если данные рабочего времени некорректные
+ * @throws std::runtime_error если данные продолжительности работы мотора некорректные
  */
-void saveRunTimeToWindow(const uint8_t &body) {
-    uint32_t runningTime = getRuntimeFromJson(body);
-    window.setRunningMotorTime(runningTime);
+void saveRunTimeToWindow(const uint8_t &body, JsonDocument &error) {
+    try {
+        uint32_t runningTime = getRuntimeFromJson(body);
+        window.setRunningMotorTime(runningTime);
+    } catch (const std::exception &e) {
+        error["message"] = e.what();
+    }
+}
+
+/**
+ * Сохранить значения влажности почвы, при которых включается и выключается полив
+ * @param body значения влажности почвы, при которых включается и выключается полив
+ * @param error объект для сохранения ошибки, если данные рабочего времени некорректные
+ * @throws std::runtime_error если данные влажности некорректные
+ */
+void saveWatering(const JsonObject &body, JsonDocument &error) {
+    int16_t waterPressure = body["waterPressure"];
+
+    JsonObject soil = body["soil"];
+    int16_t drySoil = soil["dry"];
+    int16_t wetSoil = soil["wet"];
+
+    if (waterPressure < 0) throw std::runtime_error("API. Давление воды не может быть отрицательным.");
+    if ((drySoil < 0) || (wetSoil < 0)) throw std::runtime_error("API. Значение влажности не может быть ниже нуля.");
+    if (drySoil < wetSoil) throw std::runtime_error("API. Значение мокрой почвы не может быть ниже сухой почвы.");
+    if (drySoil > SoilMoistureLevel::MAX) throw std::runtime_error("API. Значение влажной почвы не может быть выше максимального.");
+    if (wetSoil < SoilMoistureLevel::MIN) throw std::runtime_error("API. Значение сухой почвы не может быть ниже минимального.");
+
+    try {
+        watering.setWaterPressureValue(waterPressure);
+        watering.setSoilMoistureValue(SoilMoisture::DRY, drySoil);
+        watering.setSoilMoistureValue(SoilMoisture::WET, wetSoil);
+    } catch (const std::exception &e) {
+        error["message"] = e.what();
+    }
 }
 
 /**
