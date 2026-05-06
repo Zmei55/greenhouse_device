@@ -1,5 +1,7 @@
 #include "Watering.h"
 
+Watering::Watering() {};
+
 Watering::Watering(uint8_t moisturePin, uint8_t pumpOnePin, uint8_t pumpTwoPin) {
     _moisturePin = moisturePin;
     _pumpOnePin = pumpOnePin;
@@ -28,9 +30,17 @@ void Watering::disable() {
     togglePumpState();
 }
 
-bool Watering::getPumpState() { return _isPumpOn; }
+bool Watering::isPumpOn() { return _isPumpOn; }
 
 void Watering::togglePumpState() { _isPumpOn = !_isPumpOn; }
+
+bool Watering::isSoilWet() {
+    return analogRead(getMoisturePin()) < _soilWetValue ? true : false;
+}
+
+bool Watering::isSoilDry() {
+    return analogRead(getMoisturePin()) > _soilDryValue ? true : false;
+}
 
 uint16_t Watering::getSoilMoistureValue(SoilMoisture moisture) {
     if (moisture == SoilMoisture::DRY)
