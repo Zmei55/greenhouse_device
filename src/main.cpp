@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include "./sensors/lightSensor.h"
 #include "./sensors/thermometer.h"
 #include "api.h"
 #include "config.h"
@@ -77,8 +76,8 @@ void loop() {
 void checkSensors() {
     /** Если датчик освещенности подключен, то выполняется код... */
     if (hasPhotoSensorRef) {
-        bool isDarkAndLedStripsOff = getLightSensorValue() && !lighting.getLedStripsState(); // темно и освещение выключено
-        bool isLightAndLedStripsOn = !getLightSensorValue() && lighting.getLedStripsState(); // светло и освещение включено
+        bool isDarkAndLedStripsOff = lighting.isDark() && !lighting.isLedStripsOn(); // темно и освещение выключено
+        bool isLightAndLedStripsOn = !lighting.isDark() && lighting.isLedStripsOn(); // светло и освещение включено
 
         /** Если естественного освещения не достаточно, то выполняется код... */
         if (isDarkAndLedStripsOff) {
