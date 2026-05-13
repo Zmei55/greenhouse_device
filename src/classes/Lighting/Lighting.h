@@ -10,7 +10,19 @@
 
 class Lighting {
   public:
+    /**
+     * Конструктор класса
+     * @return новый объект освещения
+     */
     Lighting();
+    /**
+     * Конструктор класса
+     * @param photoSensorPin пин, по которому принимаются данные от датчика освещения
+     * @param ledStripOnePin пин, по которому происходит управление лентой освещения № 1
+     * @param ledStripTwoPin пин, по которому происходит управление лентой освещения № 2
+     * @param ledStripThreePin пин, по которому происходит управление лентой освещения № 3
+     * @return новый объект освещения
+     */
     Lighting(uint8_t photoSensorPin,
              uint8_t ledStripOnePin,
              uint8_t ledStripTwoPin,
