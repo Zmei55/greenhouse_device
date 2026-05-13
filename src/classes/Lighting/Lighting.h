@@ -10,8 +10,22 @@
 
 class Lighting {
   public:
+    /**
+     * Конструктор класса
+     * @return новый объект освещения
+     */
     Lighting();
-    Lighting(uint8_t photoSensorPin, uint8_t ledStripOnePin, uint8_t ledStripTwoPin,
+    /**
+     * Конструктор класса
+     * @param photoSensorPin пин, по которому принимаются данные от датчика освещения
+     * @param ledStripOnePin пин, по которому происходит управление лентой освещения № 1
+     * @param ledStripTwoPin пин, по которому происходит управление лентой освещения № 2
+     * @param ledStripThreePin пин, по которому происходит управление лентой освещения № 3
+     * @return новый объект освещения
+     */
+    Lighting(uint8_t photoSensorPin,
+             uint8_t ledStripOnePin,
+             uint8_t ledStripTwoPin,
              uint8_t ledStripThreePin);
 
     /** Получить значение пина фотосенсора */
@@ -26,6 +40,14 @@ class Lighting {
     /** Получить значение пина led-полосы 3 */
     uint8_t getLedStripThreePin();
 
+    /**
+     * Возвращает булевое значение освещенности
+     * настраивается на датчике, переменным резистором
+     * true -> темно
+     * false -> светло
+     */
+    bool isDark();
+
     /** Включить освещение */
     void on();
 
@@ -33,7 +55,7 @@ class Lighting {
     void off();
 
     /** Получить состояние освещения (включено/выключено) */
-    bool getLedStripsState();
+    bool isLedStripsOn();
 
     /** Изменить состояние освещения (включено/выключено) */
     void toggleLedStripsState();

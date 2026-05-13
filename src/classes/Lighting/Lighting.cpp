@@ -2,7 +2,9 @@
 
 Lighting::Lighting() {}
 
-Lighting::Lighting(uint8_t photoSensorPin, uint8_t ledStripOnePin, uint8_t ledStripTwoPin,
+Lighting::Lighting(uint8_t photoSensorPin,
+                   uint8_t ledStripOnePin,
+                   uint8_t ledStripTwoPin,
                    uint8_t ledStripThreePin) {
     _photoSensorPin = photoSensorPin;
     _ledStripOnePin = ledStripOnePin;
@@ -17,6 +19,13 @@ uint8_t Lighting::getLedStripOnePin() { return _ledStripOnePin; }
 uint8_t Lighting::getLedStripTwoPin() { return _ledStripTwoPin; }
 
 uint8_t Lighting::getLedStripThreePin() { return _ledStripThreePin; }
+
+bool Lighting::isDark() {
+    static bool isDark = false;
+
+    isDark = digitalRead(getPhotoSensorPin());
+    return isDark;
+}
 
 void Lighting::on() {
     if (_isLedStripsOn) throw std::runtime_error("Освещение уже включено.");
@@ -36,6 +45,6 @@ void Lighting::off() {
     toggleLedStripsState();
 }
 
-bool Lighting::getLedStripsState() { return _isLedStripsOn; }
+bool Lighting::isLedStripsOn() { return _isLedStripsOn; }
 
 void Lighting::toggleLedStripsState() { _isLedStripsOn = !_isLedStripsOn; }
