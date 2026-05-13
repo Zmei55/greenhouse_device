@@ -36,9 +36,10 @@ void setup() {
 }
 
 void loop() {
-    /** Работа всех датчиков по контрольному времени (повторяющийся интервал) */
-    timer.interval(controlTimeRef, []() {
-        if (isWorkTimeEnabledRef) {
+    /** Если рабочее время установлено... */
+    if (isWorkTimeEnabledRef) {
+        /** Работа всех датчиков по контрольному времени (повторяющийся интервал) */
+        timer.interval(controlTimeRef, []() {
             // код выполняется, если рабочее время установлено
             bool isWorkingTime = (utils.getNowTimeToInt(rtc.now()) >= WTStartRef.getWorkTimeAsInt()) &&
                                  (utils.getNowTimeToInt(rtc.now()) <= WTEndRef.getWorkTimeAsInt()); // Рабочее ли время
@@ -46,16 +47,28 @@ void loop() {
             if (isWorkingTime) {
                 // код выполняется, если время рабочее
                 checkSensors();
-            } else {
-                // код выполняется, если время не рабочее
             }
-        } else {
-            // код выполняется, если рабочее время не установлено
-            checkSensors();
-        }
-    });
+        });
 
-    /** Если мотор, открывающий/закрывающий окно, включен, то выполняется код... */
+        /** Если осталось 15 мин до окончания рабочего времени */
+        if ((utils.getNowTimeToInt(rtc.now()) >= (WTEndRef.getWorkTimeAsInt() - 1000 * 60 * 25)) && (utils.getNowTimeToInt(rtc.now()) < (WTEndRef.getWorkTimeAsInt() - 1000 * 60 * 2))) {
+            timer.interval(1000 * 60 * 15, []() {
+                checkSensors();
+            });
+        }
+
+        /** Если осталась 1 мин до окончания рабочего времени */
+        if ((utils.getNowTimeToInt(rtc.now()) >= (WTEndRef.getWorkTimeAsInt() - 1000 * 60 * 2)) && !window.getIsMotorOn() && window.getIsWindowOpen()) {
+            timer.interval(1000 * 60, []() {
+                window.close();
+            });
+        }
+    }
+
+    /**
+     * Если мотор, открывающий/закрывающий окно, включен, то выполняется код...
+     * даже если сейчас не рабочее время
+     */
     if (window.getIsMotorOn())
         stopingWindowMotor(window.getMotorStartTime(), window.getRunningMotorTime());
 
@@ -120,7 +133,7 @@ void checkSensors() {
 }
 
 /**
- * Выполняется остановка мотора, открывающего/закрывающего окно
+ * @brief Выполняется остановка мотора, открывающего/закрывающего окно
  * @param startMotor начало работы мотора
  * @param delay время, через которое мотор должен остановиться
  */
