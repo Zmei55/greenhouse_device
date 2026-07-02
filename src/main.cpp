@@ -63,8 +63,8 @@ void loop() {
      * Проверка уровня влажности почвы каждую секунду после включения полива
      * Если влажность достаточная, то полив отключается, даже если сейчас не рабочее время
      */
-    timer.intervalWithFlag(1000, watering.isPumpOn(), []() {
-        bool isSoilDryAndWateringOn = watering.isSoilDry() && watering.isPumpOn(); // Почва влажная и полив включен
+    timer.intervalWithFlag(1000, watering.getIsPumpOn(), []() {
+        bool isSoilDryAndWateringOn = watering.isSoilDry() && watering.getIsPumpOn(); // Почва влажная и полив включен
 
         if (isSoilDryAndWateringOn) {
             watering.disable();
@@ -76,8 +76,8 @@ void loop() {
 void checkSensors() {
     /** Если датчик освещенности подключен, то выполняется код... */
     if (hasPhotoSensorRef) {
-        bool isDarkAndLedStripsOff = lighting.isDark() && !lighting.isLedStripsOn(); // темно и освещение выключено
-        bool isLightAndLedStripsOn = !lighting.isDark() && lighting.isLedStripsOn(); // светло и освещение включено
+        bool isDarkAndLedStripsOff = lighting.getIsDark() && !lighting.getIsLedStripsOn(); // темно и освещение выключено
+        bool isLightAndLedStripsOn = !lighting.getIsDark() && lighting.getIsLedStripsOn(); // светло и освещение включено
 
         /** Если естественного освещения не достаточно, то выполняется код... */
         if (isDarkAndLedStripsOff) {
@@ -111,7 +111,7 @@ void checkSensors() {
     if (hasSoilMoistureSensorRef) {
         Serial.print("Влажность почвы: ");
         Serial.println(analogRead(SOIL_MOISTURE_PIN));
-        bool isSoilWetAndWateringOff = watering.isSoilWet() && !watering.isPumpOn(); // Почва сухая и полив выключен
+        bool isSoilWetAndWateringOff = watering.isSoilWet() && !watering.getIsPumpOn(); // Почва сухая и полив выключен
 
         if (isSoilWetAndWateringOff) {
             watering.enable();

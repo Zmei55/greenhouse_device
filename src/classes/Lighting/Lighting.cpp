@@ -20,7 +20,7 @@ uint8_t Lighting::getLedStripTwoPin() { return _ledStripTwoPin; }
 
 uint8_t Lighting::getLedStripThreePin() { return _ledStripThreePin; }
 
-bool Lighting::isDark() {
+bool Lighting::getIsDark() {
     static bool isDark = false;
 
     isDark = digitalRead(getPhotoSensorPin());
@@ -45,6 +45,6 @@ void Lighting::off() {
     toggleLedStripsState();
 }
 
-bool Lighting::isLedStripsOn() { return _isLedStripsOn; }
+bool Lighting::getIsLedStripsOn() { return _isLedStripsOn; }
 
 void Lighting::toggleLedStripsState() { _isLedStripsOn = !_isLedStripsOn; }

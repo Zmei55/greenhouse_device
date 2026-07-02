@@ -46,7 +46,7 @@ class Lighting {
      * true -> темно
      * false -> светло
      */
-    bool isDark();
+    bool getIsDark();
 
     /** Включить освещение */
     void on();
@@ -55,7 +55,7 @@ class Lighting {
     void off();
 
     /** Получить состояние освещения (включено/выключено) */
-    bool isLedStripsOn();
+    bool getIsLedStripsOn();
 
     /** Изменить состояние освещения (включено/выключено) */
     void toggleLedStripsState();

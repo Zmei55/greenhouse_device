@@ -79,8 +79,9 @@ void apiHandler() {
 
         controlTemperatureRef = body["controlTemperature"]; // Установка значение контрольной температуры
         controlTimeRef = (int)body["controlTime"] * 1000; // Установка значение контрольного времени (интервала проверки показаний датчиков) в миллисекундах
+        uint32_t runningTime = getRuntimeFromJson(body["runningTime"]);
+        window.setRunningMotorTime(runningTime); // Установка значение времени работы мотора окна в миллисекундах
         saveSensorsValue(body["sensors"]); // Включение / выключение сенсоров
-        saveRunTimeToWindow(body["runningTime"], error); // Установка значение времени работы мотора окна в миллисекундах
         saveWatering(body["watering"], error); // Установка значений влажности почвы, при которых нужно включать и выключать полив
         saveWorkingTime(body["workingHours"], error); // Установка рабочего времени
 
@@ -92,26 +93,58 @@ void apiHandler() {
     });
 
     /** TESTS: Тестирование оборудования */
+    /** Отправка первоначального состояния устройства: что включено, а что выключено в данный момент */
+    server.on("/tests/all", HTTP_GET, [](AsyncWebServerRequest *request) {
+        try {
+            JsonDocument data;
+            getIsLightingOnAsJson(data, "lighting");
+            getIsWaterPumpOnAsJson(data, "waterPump");
+            getIsWindowOpenAsJson(data, "window");
+            request->send(200, "application/json", data.as<String>());
+        } catch (const std::exception &e) {
+            JsonDocument error;
+            error["message"] = e.what();
+            request->send(400, "application/json", error.as<String>());
+        }
+    });
+
     /** TEST: Тестирование освещения (включение светодиодной ленты) */
     server.on("/tests/led-strips/on", HTTP_GET, [](AsyncWebServerRequest *request) {
-        lighting.on();
-        request->send(200);
+        try {
+            lighting.on();
+            JsonDocument data;
+            getIsLightingOnAsJson(data);
+            request->send(200, "application/json", data.as<String>());
+        } catch (const std::exception &e) {
+            JsonDocument error;
+            error["message"] = e.what();
+            request->send(400, "application/json", error.as<String>());
+        }
     });
 
     /** TEST: Тестирование освещения (выключение светодиодной ленты) */
     server.on("/tests/led-strips/off", HTTP_GET, [](AsyncWebServerRequest *request) {
-        lighting.off();
-        request->send(200);
+        try {
+            lighting.off();
+            JsonDocument data;
+            getIsLightingOnAsJson(data);
+            request->send(200, "application/json", data.as<String>());
+        } catch (const std::exception &e) {
+            JsonDocument error;
+            error["message"] = e.what();
+            request->send(400, "application/json", error.as<String>());
+        }
     });
 
     /** TEST: Тестирование водяного насоса (включение насоса) */
     server.on("/tests/water-pump/on", HTTP_GET, [](AsyncWebServerRequest *request) {
-        JsonDocument error;
-
         try {
             watering.enable();
-            request->send(200);
+            JsonDocument data;
+            getIsWaterPumpOnAsJson(data);
+            request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
+            JsonDocument error;
             error["message"] = e.what();
             request->send(400, "application/json", error.as<String>());
         }
@@ -119,12 +152,13 @@ void apiHandler() {
 
     /** TEST: Тестирование водяного насоса (выключение насоса) */
     server.on("/tests/water-pump/off", HTTP_GET, [](AsyncWebServerRequest *request) {
-        JsonDocument error;
-
         try {
             watering.disable();
-            request->send(200);
+            JsonDocument data;
+            getIsWaterPumpOnAsJson(data);
+            request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
+            JsonDocument error;
             error["message"] = e.what();
             request->send(400, "application/json", error.as<String>());
         }
@@ -135,14 +169,17 @@ void apiHandler() {
      * @param json объект с указанием времени, в течении которого мотор открывает окно (в секундах)
      */
     server.on("/tests/window/open", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json) {
-        JsonDocument error;
-        JsonObject body = json.as<JsonObject>();
-
         try {
-            saveRunTimeToWindow(body["runningTime"], error);
+            uint32_t runningTime = getRuntimeFromJson(json.as<JsonObject>());
+            window.setRunningMotorTime(runningTime);
             window.open();
-            request->send(200);
+
+            JsonDocument data;
+            JsonObject windowForTest = data.to<JsonObject>();
+            windowForTest["isOpen"] = true;
+            request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
+            JsonDocument error;
             error["message"] = e.what();
             request->send(400, "application/json", error.as<String>());
         }
@@ -153,14 +190,17 @@ void apiHandler() {
      * @param json объект с новыми настройками
      */
     server.on("/tests/window/close", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json) {
-        JsonDocument error;
-        JsonObject body = json.as<JsonObject>();
-
         try {
-            saveRunTimeToWindow(body["runningTime"], error);
+            uint32_t runningTime = getRuntimeFromJson(json.as<JsonObject>());
+            window.setRunningMotorTime(runningTime);
             window.close();
-            request->send(200);
+
+            JsonDocument data;
+            JsonObject windowForTest = data.to<JsonObject>();
+            windowForTest["isOpen"] = false;
+            request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
+            JsonDocument error;
             error["message"] = e.what();
             request->send(400, "application/json", error.as<String>());
         }

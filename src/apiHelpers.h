@@ -48,14 +48,6 @@ JsonDocument getSettingsValueAsJson();
 uint32_t getRuntimeFromJson(const uint8_t &body);
 
 /**
- * Сохранить время работы открывания окна в объекте Window
- * @param body время, в течении которого надо открывать окно (в секундах)
- * @param error объект для сохранения ошибки, если данные рабочего времени некорректные
- * @throws std::runtime_error если данные продолжительности работы мотора некорректные
- */
-void saveRunTimeToWindow(const uint8_t &body, JsonDocument &error);
-
-/**
  * Сохранить значения влажности почвы, при которых включается и выключается полив
  * @param body значения влажности почвы, при которых включается и выключается полив
  * @param error объект для сохранения ошибки, если данные рабочего времени некорректные
@@ -70,3 +62,26 @@ void saveWatering(const JsonObject &body, JsonDocument &error);
  * @throws std::runtime_error если данные рабочего времени некорректные
  */
 void saveWorkingTime(const JsonObject &body, JsonDocument &error);
+
+/**
+ * Получить состояние освещения (вкл/выкл)
+ * @param data объект, в котором надо сохранить данные
+ * @param name (не обязат) название поля, в котором сохранять данные
+ */
+void getIsLightingOnAsJson(JsonDocument &data);
+void getIsLightingOnAsJson(JsonDocument &data, std::string name);
+
+/**
+ * Получить состояние водяного насоса (вкл/выкл)
+ * @param data объект, в котором надо сохранить данные
+ * @param name (не обязат) название поля, в котором сохранять данные
+ */
+void getIsWaterPumpOnAsJson(JsonDocument &data);
+void getIsWaterPumpOnAsJson(JsonDocument &data, std::string name);
+
+/**
+ * Получить состояние окна (открыто/закрыто)
+ * @param data объект, в котором надо сохранить данные
+ * @param name название поля, в котором сохранять данные
+ */
+void getIsWindowOpenAsJson(JsonDocument &data, std::string name);

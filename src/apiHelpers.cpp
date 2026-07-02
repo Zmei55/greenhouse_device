@@ -72,15 +72,6 @@ uint32_t getRuntimeFromJson(const uint8_t &body) {
     return runningTime;
 }
 
-void saveRunTimeToWindow(const uint8_t &body, JsonDocument &error) {
-    try {
-        uint32_t runningTime = getRuntimeFromJson(body);
-        window.setRunningMotorTime(runningTime);
-    } catch (const std::exception &e) {
-        error["message"] = e.what();
-    }
-}
-
 void saveWatering(const JsonObject &body, JsonDocument &error) {
     int16_t waterPressure = body["waterPressure"];
 
@@ -118,4 +109,29 @@ void saveWorkingTime(const JsonObject &body, JsonDocument &error) {
         WTStartRef.reset();
         WTEndRef.reset();
     }
+}
+
+void getIsLightingOnAsJson(JsonDocument &data) {
+    JsonObject lightingForTest = data.to<JsonObject>();
+    lightingForTest["isOn"] = lighting.getIsLedStripsOn();
+}
+
+void getIsLightingOnAsJson(JsonDocument &data, std::string name) {
+    JsonObject lightingForTest = data[name].to<JsonObject>();
+    lightingForTest["isOn"] = lighting.getIsLedStripsOn();
+}
+
+void getIsWaterPumpOnAsJson(JsonDocument &data) {
+    JsonObject waterPumpForTest = data.to<JsonObject>();
+    waterPumpForTest["isOn"] = watering.getIsPumpOn();
+}
+
+void getIsWaterPumpOnAsJson(JsonDocument &data, std::string name) {
+    JsonObject waterPumpForTest = data[name].to<JsonObject>();
+    waterPumpForTest["isOn"] = watering.getIsPumpOn();
+}
+
+void getIsWindowOpenAsJson(JsonDocument &data, std::string name) {
+    JsonObject windowForTest = data[name].to<JsonObject>();
+    windowForTest["isOpen"] = window.getIsWindowOpen();
 }

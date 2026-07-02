@@ -42,7 +42,7 @@ class Watering {
     void disable();
 
     /** Получить значение состояния насоса (true - включен / false - выключен) */
-    bool isPumpOn();
+    bool getIsPumpOn();
 
     /** Изменить состояние насоса (включен/выключен) */
     void togglePumpState();

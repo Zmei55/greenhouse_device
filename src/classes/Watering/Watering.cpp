@@ -30,7 +30,7 @@ void Watering::disable() {
     togglePumpState();
 }
 
-bool Watering::isPumpOn() { return _isPumpOn; }
+bool Watering::getIsPumpOn() { return _isPumpOn; }
 
 void Watering::togglePumpState() { _isPumpOn = !_isPumpOn; }
 
