@@ -79,7 +79,7 @@ void apiHandler() {
 
         controlTemperatureRef = body["controlTemperature"]; // Установка значение контрольной температуры
         controlTimeRef = (int)body["controlTime"] * 1000; // Установка значение контрольного времени (интервала проверки показаний датчиков) в миллисекундах
-        uint32_t runningTime = getRuntimeFromJson(body["runningTime"]);
+        uint32_t runningTime = getRuntimeFromJson(body);
         window.setRunningMotorTime(runningTime); // Установка значение времени работы мотора окна в миллисекундах
         saveSensorsValue(body["sensors"]); // Включение / выключение сенсоров
         saveWatering(body["watering"], error); // Установка значений влажности почвы, при которых нужно включать и выключать полив

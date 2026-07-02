@@ -42,10 +42,11 @@ JsonDocument getSettingsValueAsJson();
 
 /**
  * Получить время работы открывания окна из json
- * @param body время, в течении которого надо открывать окно (в секундах)
+ * @param body json-объект, содержащий время, в течении которого надо открывать окно (в секундах)
+ * @example getRuntimeFromJson(json.as<JsonObject>());
  * @return время, в течении которого надо открывать окно (в миллисекундах)
  */
-uint32_t getRuntimeFromJson(const uint8_t &body);
+uint32_t getRuntimeFromJson(const JsonObject &body);
 
 /**
  * Сохранить значения влажности почвы, при которых включается и выключается полив
@@ -57,7 +58,7 @@ void saveWatering(const JsonObject &body, JsonDocument &error);
 
 /**
  * Сохранить рабочее время устройства
- * @param body объект с данными рабочего времени
+ * @param body json-объект с данными рабочего времени
  * @param error объект для сохранения ошибки, если данные рабочего времени некорректные
  * @throws std::runtime_error если данные рабочего времени некорректные
  */
@@ -65,7 +66,7 @@ void saveWorkingTime(const JsonObject &body, JsonDocument &error);
 
 /**
  * Получить состояние освещения (вкл/выкл)
- * @param data объект, в котором надо сохранить данные
+ * @param data json-объект, в котором надо сохранить данные
  * @param name (не обязат) название поля, в котором сохранять данные
  */
 void getIsLightingOnAsJson(JsonDocument &data);
@@ -73,7 +74,7 @@ void getIsLightingOnAsJson(JsonDocument &data, std::string name);
 
 /**
  * Получить состояние водяного насоса (вкл/выкл)
- * @param data объект, в котором надо сохранить данные
+ * @param data json-json-объект, в котором надо сохранить данные
  * @param name (не обязат) название поля, в котором сохранять данные
  */
 void getIsWaterPumpOnAsJson(JsonDocument &data);
@@ -81,7 +82,7 @@ void getIsWaterPumpOnAsJson(JsonDocument &data, std::string name);
 
 /**
  * Получить состояние окна (открыто/закрыто)
- * @param data объект, в котором надо сохранить данные
+ * @param data json-объект, в котором надо сохранить данные
  * @param name название поля, в котором сохранять данные
  */
 void getIsWindowOpenAsJson(JsonDocument &data, std::string name);

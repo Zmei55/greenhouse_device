@@ -64,8 +64,8 @@ JsonDocument getSettingsValueAsJson() {
     return data;
 }
 
-uint32_t getRuntimeFromJson(const uint8_t &body) {
-    uint32_t runningTime = body;
+uint32_t getRuntimeFromJson(const JsonObject &body) {
+    uint32_t runningTime = body["runningTime"];
     if (runningTime <= 0) throw std::runtime_error("API. Время открывания/закрывания окна не может быть равно или меньше нуля.");
 
     runningTime *= 1000; // переводит секунды в миллисекунды
