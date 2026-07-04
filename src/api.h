@@ -164,16 +164,10 @@ void apiHandler() {
         }
     });
 
-    /**
-     * TEST: Тестирование мотора (открытие окна)
-     * @param json объект с указанием времени, в течении которого мотор открывает окно (в секундах)
-     */
-    server.on("/tests/window/open", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json) {
+    /** TEST: Тестирование мотора (открытие окна) */
+    server.on("/tests/window/open", HTTP_GET, [](AsyncWebServerRequest *request) {
         try {
-            uint32_t runningTime = getRuntimeFromJson(json.as<JsonObject>());
-            window.setRunningMotorTime(runningTime);
             window.open();
-
             JsonDocument data;
             JsonObject windowForTest = data.to<JsonObject>();
             windowForTest["isOpen"] = true;
@@ -185,16 +179,10 @@ void apiHandler() {
         }
     });
 
-    /**
-     * TEST: Тестирование мотора (закрытие окна)
-     * @param json объект с новыми настройками
-     */
-    server.on("/tests/window/close", HTTP_POST, [](AsyncWebServerRequest *request, JsonVariant &json) {
+    /** TEST: Тестирование мотора (закрытие окна) */
+    server.on("/tests/window/close", HTTP_GET, [](AsyncWebServerRequest *request) {
         try {
-            uint32_t runningTime = getRuntimeFromJson(json.as<JsonObject>());
-            window.setRunningMotorTime(runningTime);
             window.close();
-
             JsonDocument data;
             JsonObject windowForTest = data.to<JsonObject>();
             windowForTest["isOpen"] = false;
