@@ -1,6 +1,12 @@
 #include "apiHelpers.h"
 #include "./enums.h"
 
+void sendErrorAsString(AsyncWebServerRequest *request, const std::exception &e) {
+    JsonDocument error;
+    error["message"] = e.what();
+    request->send(400, "application/json", error.as<String>());
+}
+
 JsonDocument getCurrentTimeAsJson() {
     JsonDocument data;
     char buf[] = "YYYY-MM-DDThh:mm:ss";
@@ -74,6 +80,8 @@ uint32_t getRuntimeFromJson(const JsonObject &body) {
 
 void saveWatering(const JsonObject &body, JsonDocument &error) {
     int16_t waterPressure = body["waterPressure"];
+    if (waterPressure > 225) throw std::runtime_error("API. Мощность насоса не должно быть больше 225.");
+    if (waterPressure < 0) throw std::runtime_error("API. Мощность насоса не должно быть меньше 0.");
 
     JsonObject soil = body["soil"];
     int16_t drySoil = soil["dry"];

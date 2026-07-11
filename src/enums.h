@@ -2,16 +2,10 @@
 
 /**
  * Варианты влажности почвы
- * DRY - влажная
- * WET - сухая
+ * DRY - сухая
+ * WET - влажная
  */
 enum SoilMoisture {
-    DRY,
-    WET
-};
-
-/** Уровни влажности почвы */
-enum SoilMoistureLevel : uint16_t {
-    MAX = 3710,
-    MIN = 1490,
+    DRY, // сухая
+    WET // влажная
 };

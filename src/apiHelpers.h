@@ -3,6 +3,9 @@
 
 #include "config.h"
 
+/** Отправлять json-ответ с ошибкой код 400 и сообщение как строку */
+void sendErrorAsString(AsyncWebServerRequest *request, const std::exception &e);
+
 /**
  * Получить даты и времени устройства (датчика реального времени DS3231) в формате json
  * @return дату и время устройства (JsonDocument)

@@ -102,9 +102,7 @@ void apiHandler() {
             getIsWindowOpenAsJson(data, "window");
             request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
-            JsonDocument error;
-            error["message"] = e.what();
-            request->send(400, "application/json", error.as<String>());
+            sendErrorAsString(request, e);
         }
     });
 
@@ -116,9 +114,7 @@ void apiHandler() {
             getIsLightingOnAsJson(data);
             request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
-            JsonDocument error;
-            error["message"] = e.what();
-            request->send(400, "application/json", error.as<String>());
+            sendErrorAsString(request, e);
         }
     });
 
@@ -130,9 +126,7 @@ void apiHandler() {
             getIsLightingOnAsJson(data);
             request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
-            JsonDocument error;
-            error["message"] = e.what();
-            request->send(400, "application/json", error.as<String>());
+            sendErrorAsString(request, e);
         }
     });
 
@@ -144,9 +138,7 @@ void apiHandler() {
             getIsWaterPumpOnAsJson(data);
             request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
-            JsonDocument error;
-            error["message"] = e.what();
-            request->send(400, "application/json", error.as<String>());
+            sendErrorAsString(request, e);
         }
     });
 
@@ -158,9 +150,7 @@ void apiHandler() {
             getIsWaterPumpOnAsJson(data);
             request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
-            JsonDocument error;
-            error["message"] = e.what();
-            request->send(400, "application/json", error.as<String>());
+            sendErrorAsString(request, e);
         }
     });
 
@@ -173,9 +163,7 @@ void apiHandler() {
             windowForTest["isOpen"] = true;
             request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
-            JsonDocument error;
-            error["message"] = e.what();
-            request->send(400, "application/json", error.as<String>());
+            sendErrorAsString(request, e);
         }
     });
 
@@ -188,9 +176,7 @@ void apiHandler() {
             windowForTest["isOpen"] = false;
             request->send(200, "application/json", data.as<String>());
         } catch (const std::exception &e) {
-            JsonDocument error;
-            error["message"] = e.what();
-            request->send(400, "application/json", error.as<String>());
+            sendErrorAsString(request, e);
         }
     });
 }

@@ -17,9 +17,9 @@ uint8_t Watering::getPumpTwoPin() { return _pumpTwoPin; }
 void Watering::enable() {
     if (_isPumpOn) throw std::runtime_error("Насос уже запущен.");
 
-    analogWrite(_pumpOnePin, 50);
+    analogWrite(_pumpOnePin, _waterPressure);
     digitalWrite(_pumpTwoPin, LOW);
-    togglePumpState();
+    _isPumpOn = true;
 }
 
 void Watering::disable() {
@@ -27,19 +27,17 @@ void Watering::disable() {
 
     analogWrite(_pumpOnePin, 0);
     digitalWrite(_pumpTwoPin, LOW);
-    togglePumpState();
+    _isPumpOn = false;
 }
 
 bool Watering::getIsPumpOn() { return _isPumpOn; }
 
-void Watering::togglePumpState() { _isPumpOn = !_isPumpOn; }
-
 bool Watering::isSoilWet() {
-    return analogRead(getMoisturePin()) < _soilWetValue ? true : false;
+    return analogRead(getMoisturePin()) > _soilWetValue ? true : false;
 }
 
 bool Watering::isSoilDry() {
-    return analogRead(getMoisturePin()) > _soilDryValue ? true : false;
+    return analogRead(getMoisturePin()) < _soilDryValue ? true : false;
 }
 
 uint16_t Watering::getSoilMoistureValue(SoilMoisture moisture) {
@@ -50,13 +48,11 @@ uint16_t Watering::getSoilMoistureValue(SoilMoisture moisture) {
 }
 
 uint16_t Watering::setSoilMoistureValue(SoilMoisture moisture, uint16_t value) {
-    if (value < 0) throw std::runtime_error("Уровень влажности не может быть меньше нуля.");
+    if (value < 1) throw std::runtime_error("Уровень влажности не может быть меньше нуля.");
 
     if (moisture == SoilMoisture::DRY) {
-        if (value > SoilMoistureLevel::MAX) throw std::runtime_error("Значение влажной почвы не может быть выше максимального.");
         return _soilDryValue = value;
     } else {
-        if (value < SoilMoistureLevel::MIN) throw std::runtime_error("Значение сухой почвы не может быть ниже минимального.");
         return _soilWetValue = value;
     }
 }
