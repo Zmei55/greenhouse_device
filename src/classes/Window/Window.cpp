@@ -15,9 +15,9 @@ void Window::open() {
     if (_isMotorOn) throw std::runtime_error("Мотор уже запущен.");
     if (_isWindowOpen) throw std::runtime_error("Окно уже открыто.");
 
-    analogWrite(_motorPinOne, 250);
+    analogWrite(_motorPinOne, 220);
     digitalWrite(_motorPinTwo, LOW);
-    toggleMotorState();
+    _isMotorOn = true;
     setMotorStartTime();
 }
 
@@ -26,8 +26,8 @@ void Window::close() {
     if (!_isWindowOpen) throw std::runtime_error("Окно уже закрыто.");
 
     digitalWrite(_motorPinOne, LOW);
-    analogWrite(_motorPinTwo, 250);
-    toggleMotorState();
+    analogWrite(_motorPinTwo, 220);
+    _isMotorOn = true;
     setMotorStartTime();
 }
 
@@ -47,8 +47,6 @@ uint32_t Window::setRunningMotorTime(uint32_t runningTime) {
 }
 
 bool Window::getIsMotorOn() { return _isMotorOn; }
-
-void Window::toggleMotorState() { _isMotorOn = !_isMotorOn; }
 
 void Window::setMotorOff() { _isMotorOn = false; }
 
